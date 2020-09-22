@@ -40,6 +40,16 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
+//interface stuff
+int modelNum = 6;       //showing vase by default
+float value = 0;
+
+//user interface
+void menu() {
+    std::cout << "Select Models" << std::endl;
+    std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
+  
+}
 
 int main()
 {
@@ -93,6 +103,15 @@ int main()
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
     Model ourModel("../models/vase/vase.obj");
+    Model vaseModel("../models/vase/vase.obj");
+    Model bunnyModel("../models/bunny/bunny.obj");
+    Model carModel("../models/car/car.obj");
+    Model engineModel("../models/engine/engine.obj");
+    Model sphereModel("../models/sphere/sphere.obj");
+    Model teapotModel("../models/teapot/teapot.obj");
+
+    //display user interface
+    menu();
 
     //enable this to draw in wireframe
     // -----------
@@ -102,6 +121,8 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        if (value)
+            std::cout << "VALUE: " << value << std::endl;
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -116,6 +137,27 @@ int main()
         // ------
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //model selecting stuff
+        switch (modelNum) {
+            case 1:
+                ourModel = bunnyModel;
+                break;
+            case 2:
+                ourModel = carModel;
+                break;
+            case 3:
+                ourModel = engineModel;
+                break;
+            case 4: 
+                ourModel = sphereModel;
+                break;
+            case 5:
+                ourModel = teapotModel;
+                break;
+            case 6:
+                ourModel = vaseModel;
+        }
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
@@ -135,10 +177,25 @@ int main()
         ourShader.setMat4("view", view);
         ourShader.setVec3("viewPos", viewPos);
 
-
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
+
+        //set model at proper position for different models
+        switch (modelNum) {
+            case 1:
+                model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
+            case 2:
+                model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
+            case 3:
+                model = glm::scale(model, glm::vec3(5.f, 5.f, 5.f));
+            case 4:
+                model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
+            case 5:
+                model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
+            case 6:
+                model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
+        }
+
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -212,6 +269,20 @@ void processInput(GLFWwindow* window)
         ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         ProcessKeyboard(RIGHT, deltaTime);
+
+    //Model selection
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        modelNum = 1;
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        modelNum = 2;
+    if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+        modelNum = 3;
+    if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+        modelNum = 4;
+    if(glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+        modelNum = 5;
+    if(glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+        modelNum = 6;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
