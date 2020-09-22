@@ -43,12 +43,14 @@ float rotSpeed = 2.5f;
 //interface stuff
 int modelNum = 6;       //showing vase by default
 float value = 0;
+float roughness = 0.3; // The roughness of the mesh [0,1]
+
 
 //user interface
 void menu() {
     std::cout << "Select Models" << std::endl;
     std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
-  
+    std::cout << "r: roughness [0, 1]" << std::endl;
 }
 
 int main()
@@ -121,8 +123,6 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        if (value)
-            std::cout << "VALUE: " << value << std::endl;
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -196,7 +196,6 @@ int main()
                 model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
         }
 
-        float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
         ourShader.setMat4("model", model);
@@ -283,6 +282,18 @@ void processInput(GLFWwindow* window)
         modelNum = 5;
     if(glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
         modelNum = 6;
+
+    //input scalar value
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        std::cout << "Enter roughness[0, 1]: ";
+        std::cin >> roughness;
+
+        //if out of range
+        if (roughness > 1)
+            roughness = 1.f;
+        else if (roughness < 0)
+            roughness = 0.f;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
