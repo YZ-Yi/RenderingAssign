@@ -2,12 +2,12 @@
 C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\Shader.h(56,40): warning C4101: 'e': unreferenced local variable
 C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\Mesh.h(84,1): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
 C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(46,22): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(128,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(315,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(316,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(320,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(321,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(323,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(324,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(333,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(131,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(340,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(341,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(345,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(346,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(348,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(349,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\A1\main.cpp(358,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   A1.vcxproj -> C:\Users\YiYuZ\Documents\Assignment\CPSC591\A1\A1Boilerplate\x64\Debug\A1.exe
