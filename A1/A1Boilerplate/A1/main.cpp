@@ -177,19 +177,20 @@ int main()
         ourShader.setMat4("view", view);
         ourShader.setVec3("viewPos", viewPos);
 
+
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
 
         //set model at proper position for different models
         switch (modelNum) {
             case 1:
-                model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
+                model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
             case 2:
-                model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
+                model = glm::scale(model, glm::vec3(10.f, 10.f, 10.f));
             case 3:
                 model = glm::scale(model, glm::vec3(5.f, 5.f, 5.f));
             case 4:
-                model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));
+                model = glm::scale(model, glm::vec3(0.03f, 0.03f, 0.03f));
             case 5:
                 model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
             case 6:
