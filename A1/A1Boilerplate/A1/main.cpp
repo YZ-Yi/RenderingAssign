@@ -43,9 +43,9 @@ float rotSpeed = 2.5f;
 //interface stuff
 int modelNum = 6;       //showing vase by default
 float value = 0;
-float roughness = 0.3; // The roughness of the mesh [0,1]
-glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
-
+float roughness = 0; // The roughness of the mesh [0,1]
+glm::vec3 objectColour = glm::vec3(0.722, 0.451, 0.2);
+glm::vec3 ambientStrength = glm::vec3(1.0, 1.0, 1.0);
 
 //user interface
 void menu() {
@@ -53,6 +53,7 @@ void menu() {
     std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
     std::cout << "r: roughness [0, 1]" << std::endl;
     std::cout << "c: object color: [0, 1]" << std::endl;
+    std::cout << "v: ka: [0, 1]" << std::endl;
 }
 
 int main()
@@ -204,6 +205,7 @@ int main()
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
+        ourShader.setVec3("ambientStrength", ambientStrength);
         
         ourModel.Draw(ourShader);
 
@@ -319,6 +321,29 @@ void processInput(GLFWwindow* window)
             bColor = 0.f;
 
         objectColour = glm::vec3(rColor, gColor, bColor);
+    }
+
+    //ambiemt strength for each (R, G, B)
+    if(glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
+        float rStrength, gStrength, bStrength;
+        std::cout << "Enter value [0, 1] for each (R, G, B):";
+        std::cin >> rStrength >> gStrength >> bStrength;
+
+        //if out of range
+        if (rStrength > 1)
+            rStrength = 1;
+        else if (rStrength < 0)
+            rStrength = 0;
+        if (gStrength > 1)
+            gStrength = 1;
+        else if (gStrength < 0)
+            gStrength = 0;
+        if (bStrength > 1)
+            bStrength = 1;
+        else if (bStrength < 0)
+            bStrength = 0;
+
+        ambientStrength = glm::vec3(rStrength, gStrength, bStrength);
     }
 }
 

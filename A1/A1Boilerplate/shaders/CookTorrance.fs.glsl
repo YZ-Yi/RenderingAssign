@@ -12,7 +12,7 @@ uniform vec3 objectColour;
 uniform float roughness;
 uniform vec3 lightPositions[2];
 uniform vec3 lightIntensities[2];
-
+uniform vec3 ambientStrength;        
 
 //Globals
 float PI = 3.141592653589793f;
@@ -23,8 +23,7 @@ void main()
 	//Your code goes here!
 	//Use functions to be organized! A function for D, G, and F are good starting points!
     // ambient
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightIntensities[0];
+    vec3 ambient = vec3(ambientStrength.x * lightIntensities[0].x, ambientStrength.z * lightIntensities[0].z, ambientStrength.z * lightIntensities[0].z);
   	
     // diffuse 
     vec3 norm = normalize(Normal);
