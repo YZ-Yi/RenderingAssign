@@ -48,12 +48,16 @@ glm::vec3 objectColour = glm::vec3(0.722, 0.451, 0.2);
 float ambientStrength = 1.f;
 float specularStrength = 0.7f;
 int isPi = 1;
+int isD = 1;
+int isBec = 1;
 
 //user interface
 void menu() {
     std::cout << "Select Models" << std::endl;
     std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
     std::cout << "o, p: Include Pi or not" << std::endl;
+    std::cout << "u, i: Include D or not" << std::endl;
+    std::cout << "t, y: Using Beckmann or GGX/TR to compute D" << std::endl;
     std::cout << "r: roughness [0, 1]" << std::endl;
     std::cout << "c: object color: [0, 1]" << std::endl;
     std::cout << "v: ka: [0, 1]" << std::endl;
@@ -212,6 +216,8 @@ int main()
         ourShader.setFloat("ambientStrength", ambientStrength);
         ourShader.setFloat("specularStrength", specularStrength);
         ourShader.setInt("isPi", isPi);
+        ourShader.setInt("isD", isD);
+        ourShader.setInt("isBec", isBec);
         
         ourModel.Draw(ourShader);
 
@@ -329,7 +335,7 @@ void processInput(GLFWwindow* window)
         objectColour = glm::vec3(rColor, gColor, bColor);
     }
 
-    //ambiemt strength for each (R, G, B)
+    //ambiemt strength
     if(glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
         std::cout << "Enter ambient coefficient value [0, 1]:";
         std::cin >> ambientStrength;
@@ -341,6 +347,7 @@ void processInput(GLFWwindow* window)
             ambientStrength = 0;
     }
 
+    //specular strength
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
         std::cout << "Enter specular coefficient value [0, 1]: ";
         std::cin >> specularStrength;
@@ -352,6 +359,7 @@ void processInput(GLFWwindow* window)
             specularStrength = 1;
     }
 
+    //pi
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
         if (isPi == -1)
             std::cout << "Including Pi" << std::endl;
@@ -363,6 +371,27 @@ void processInput(GLFWwindow* window)
         isPi = -1;
     }
     
+    //D stuff
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+        if (!isD)
+            std::cout << "Including D" << std::endl;
+        isD = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
+        if (isD)
+            std::cout << "Excluding D" << std::endl;
+        isD = 0;
+    }
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        if (!isBec)
+            std::cout << "Using Beckmann" << std::endl;
+        isBec = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {
+        if (isBec)
+            std::cout << "Using GGX/TR" << std::endl;
+        isBec = 0;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
