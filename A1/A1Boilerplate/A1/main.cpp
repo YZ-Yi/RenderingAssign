@@ -45,15 +45,19 @@ int modelNum = 6;       //showing vase by default
 float value = 0;
 float roughness = 0; // The roughness of the mesh [0,1]
 glm::vec3 objectColour = glm::vec3(0.722, 0.451, 0.2);
-glm::vec3 ambientStrength = glm::vec3(1.0, 1.0, 1.0);
+float ambientStrength = 1.f;
+float specularStrength = 0.7f;
+int isPi = 1;
 
 //user interface
 void menu() {
     std::cout << "Select Models" << std::endl;
     std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
+    std::cout << "o, p: Include Pi or not" << std::endl;
     std::cout << "r: roughness [0, 1]" << std::endl;
     std::cout << "c: object color: [0, 1]" << std::endl;
     std::cout << "v: ka: [0, 1]" << std::endl;
+    std::cout << "b: ks: [0, 1]" << std::endl;
 }
 
 int main()
@@ -205,7 +209,9 @@ int main()
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
-        ourShader.setVec3("ambientStrength", ambientStrength);
+        ourShader.setFloat("ambientStrength", ambientStrength);
+        ourShader.setFloat("specularStrength", specularStrength);
+        ourShader.setInt("isPi", isPi);
         
         ourModel.Draw(ourShader);
 
@@ -325,26 +331,38 @@ void processInput(GLFWwindow* window)
 
     //ambiemt strength for each (R, G, B)
     if(glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
-        float rStrength, gStrength, bStrength;
-        std::cout << "Enter value [0, 1] for each (R, G, B):";
-        std::cin >> rStrength >> gStrength >> bStrength;
+        std::cout << "Enter ambient coefficient value [0, 1]:";
+        std::cin >> ambientStrength;
 
         //if out of range
-        if (rStrength > 1)
-            rStrength = 1;
-        else if (rStrength < 0)
-            rStrength = 0;
-        if (gStrength > 1)
-            gStrength = 1;
-        else if (gStrength < 0)
-            gStrength = 0;
-        if (bStrength > 1)
-            bStrength = 1;
-        else if (bStrength < 0)
-            bStrength = 0;
-
-        ambientStrength = glm::vec3(rStrength, gStrength, bStrength);
+        if (ambientStrength > 1)
+            ambientStrength = 1;
+        else if (ambientStrength < 0)
+            ambientStrength = 0;
     }
+
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        std::cout << "Enter specular coefficient value [0, 1]: ";
+        std::cin >> specularStrength;
+
+        //if out of range
+        if (specularStrength > 1)
+            specularStrength = 1;
+        else if (specularStrength < 0)
+            specularStrength = 1;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+        if (isPi == -1)
+            std::cout << "Including Pi" << std::endl;
+        isPi = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        if (isPi == 1)
+            std::cout << "Excluding Pi" << std::endl;
+        isPi = -1;
+    }
+    
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
