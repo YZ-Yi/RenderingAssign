@@ -50,6 +50,7 @@ float specularStrength = 0.7f;
 int isPi = 1;
 int isD = 1;
 int isBec = 1;
+int isG = 1;
 
 //user interface
 void menu() {
@@ -57,6 +58,7 @@ void menu() {
     std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
     std::cout << "o, p: Include Pi or not" << std::endl;
     std::cout << "u, i: Include D or not" << std::endl;
+    std::cout << "k, l: Include G or not" << std::endl;
     std::cout << "t, y: Using Beckmann or GGX/TR to compute D" << std::endl;
     std::cout << "r: roughness [0, 1]" << std::endl;
     std::cout << "c: object color: [0, 1]" << std::endl;
@@ -190,6 +192,7 @@ int main()
         ourShader.setVec3("viewPos", viewPos);
 
 
+
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
 
@@ -217,6 +220,7 @@ int main()
         ourShader.setFloat("specularStrength", specularStrength);
         ourShader.setInt("isPi", isPi);
         ourShader.setInt("isD", isD);
+        ourShader.setInt("isG", isG);
         ourShader.setInt("isBec", isBec);
         
         ourModel.Draw(ourShader);
@@ -391,6 +395,18 @@ void processInput(GLFWwindow* window)
         if (isBec)
             std::cout << "Using GGX/TR" << std::endl;
         isBec = 0;
+    }
+
+    //G stuff
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+        if (!isG)
+            std::cout << "Including G" << std::endl;
+        isG = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        if (isG)
+            std::cout << "Excluding G" << std::endl;
+        isG = 0;
     }
 }
 

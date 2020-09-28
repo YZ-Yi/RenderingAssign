@@ -17,6 +17,7 @@ uniform float specularStrength;
 uniform int isPi;
 uniform int isD;
 uniform int isBec;
+uniform int isG;
 
 //Globals
 float PI = 3.141592653589793f;
@@ -24,6 +25,8 @@ float E = 2.718282f;
 
 float beckmann(vec3 norm, vec3 halfway, float r);
 float ggx(vec3 norm, vec3 halfway, float r);
+float geometricFunc(vec3 inRay, vec3 outRay, vec3 norm, float r);
+float g1Func(float dotVal, float r);
 
 void main()
 {   
@@ -54,6 +57,8 @@ void main()
 
     // specular
     float distribution1, distribution2;
+
+    //D
     if(isBec == 1){
         //Beckmann
         distribution1 = beckmann(norm, halfway1, roughness);
@@ -64,10 +69,22 @@ void main()
         distribution1 = beckmann(norm, halfway1, roughness);
         distribution2 = beckmann(norm, halfway2, roughness);
     }
-    
+    if(isD == 0){
+        distribution1 = 1;
+        distribution2 = 1;
+    }
+
+    //G
+    float geometric1 = geometricFunc(lightDir1, viewDir, norm, roughness);
+    float geometric2 = geometricFunc(lightDir2, viewDir, norm, roughness);
+    if(isG == 0){
+        geometric1 = 1;
+        geometric2 = 1;
+    }
+
     //Sepcular BRDF
-    float specBRDF1 = pow(distribution1, isD) / (4 * dot(lightDir1, norm) * dot(viewDir, norm));
-    float specBRDF2 = pow(distribution2, isD) / (4 * dot(lightDir2, norm) * dot(viewDir, norm));
+    float specBRDF1 = distribution1 * geometric1/ (4 * dot(lightDir1, norm) * dot(viewDir, norm));
+    float specBRDF2 = distribution2 * geometric2/ (4 * dot(lightDir2, norm) * dot(viewDir, norm));
 
     float spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
     float spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
@@ -98,4 +115,17 @@ float ggx(vec3 norm, vec3 halfway, float r){
     float temp = dotValue * dotValue * (alpha * alpha - 1) + 1;
 
     return alpha * alpha / (PI * temp * temp);
+}
+
+float geometricFunc(vec3 inRay, vec3 outRay, vec3 norm, float r){
+    float value1 = dot(norm, inRay);
+    float value2 = dot(norm, outRay);
+
+    return g1Func(value1, r) * g1Func(value2, r);
+}
+
+float g1Func(float value, float r){
+    float k = (r + 1) * (r + 1) / 8;
+
+    return value / (value * (1 - k) + k);
 }
