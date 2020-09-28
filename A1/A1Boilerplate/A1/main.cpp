@@ -45,12 +45,14 @@ int modelNum = 6;       //showing vase by default
 float value = 0;
 float roughness = 0; // The roughness of the mesh [0,1]
 glm::vec3 objectColour = glm::vec3(0.722, 0.451, 0.2);
+glm::vec3 materialColor = glm::vec3(0.98, 0.82, 0.76);
 float ambientStrength = 1.f;
 float specularStrength = 0.7f;
 int isPi = 1;
 int isD = 1;
 int isBec = 1;
 int isG = 1;
+int isF = 1;
 
 //user interface
 void menu() {
@@ -59,6 +61,7 @@ void menu() {
     std::cout << "o, p: Include Pi or not" << std::endl;
     std::cout << "u, i: Include D or not" << std::endl;
     std::cout << "k, l: Include G or not" << std::endl;
+    std::cout << "h, j: Include F or not" << std::endl;
     std::cout << "t, y: Using Beckmann or GGX/TR to compute D" << std::endl;
     std::cout << "r: roughness [0, 1]" << std::endl;
     std::cout << "c: object color: [0, 1]" << std::endl;
@@ -216,11 +219,13 @@ int main()
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
+        ourShader.setVec3("materialColor", materialColor);
         ourShader.setFloat("ambientStrength", ambientStrength);
         ourShader.setFloat("specularStrength", specularStrength);
         ourShader.setInt("isPi", isPi);
         ourShader.setInt("isD", isD);
         ourShader.setInt("isG", isG);
+        ourShader.setInt("isF", isF);
         ourShader.setInt("isBec", isBec);
         
         ourModel.Draw(ourShader);
@@ -407,6 +412,18 @@ void processInput(GLFWwindow* window)
         if (isG)
             std::cout << "Excluding G" << std::endl;
         isG = 0;
+    }
+
+    //F stuff
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+        if (!isF)
+            std::cout << "Including H" << std::endl;
+        isF = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        if (isF)
+            std::cout << "Excluding F" << std::endl;
+        isF = 0;
     }
 }
 

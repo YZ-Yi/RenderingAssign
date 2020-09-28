@@ -9,6 +9,7 @@ in vec3 Normal;
 //Constants, passed in directly from C++
 uniform vec3 viewPos;
 uniform vec3 objectColour;
+uniform vec3 materialColor;
 uniform float roughness;
 uniform vec3 lightPositions[2];
 uniform vec3 lightIntensities[2];
@@ -18,6 +19,7 @@ uniform int isPi;
 uniform int isD;
 uniform int isBec;
 uniform int isG;
+uniform int isF;
 
 //Globals
 float PI = 3.141592653589793f;
@@ -27,6 +29,7 @@ float beckmann(vec3 norm, vec3 halfway, float r);
 float ggx(vec3 norm, vec3 halfway, float r);
 float geometricFunc(vec3 inRay, vec3 outRay, vec3 norm, float r);
 float g1Func(float dotVal, float r);
+vec3 fresnel(vec3 outRay, vec3 halfway, vec3 f_0);
 
 void main()
 {   
@@ -45,7 +48,7 @@ void main()
     // diffuse 
     float diff1 = max(dot(norm, lightDir1), 0.0);
     float diff2 = max(dot(norm, lightDir2), 0.0);
-    vec3 diffuse = diff1 * lightIntensities[0] + diff2 * lightIntensities[1];
+    vec3 diffuse = (diff1 * lightIntensities[0] + diff2 * lightIntensities[1]) * objectColour;
     if(isPi == 1)
         diffuse = diffuse / PI;
 
@@ -59,37 +62,49 @@ void main()
     float distribution1, distribution2;
 
     //D
-    if(isBec == 1){
-        //Beckmann
-        distribution1 = beckmann(norm, halfway1, roughness);
-        distribution2 = beckmann(norm, halfway2, roughness);
-    }
-    else{
+   //Beckmann
+    distribution1 = beckmann(norm, halfway1, roughness);
+    distribution2 = beckmann(norm, halfway2, roughness);
+    if(isBec == 0){
         //GGX/TR
         distribution1 = beckmann(norm, halfway1, roughness);
         distribution2 = beckmann(norm, halfway2, roughness);
     }
     if(isD == 0){
-        distribution1 = 1;
-        distribution2 = 1;
+        distribution1 = 1.0;
+        distribution2 = 1.0;
     }
+
+    //distribution1 = max(distribution1, 0);
+    //distribution2 = max(distribution2, 0);
 
     //G
     float geometric1 = geometricFunc(lightDir1, viewDir, norm, roughness);
     float geometric2 = geometricFunc(lightDir2, viewDir, norm, roughness);
     if(isG == 0){
-        geometric1 = 1;
-        geometric2 = 1;
+        geometric1 = 1.0;
+        geometric2 = 1.0;
+    }
+
+    //F
+    vec3 fre1 = fresnel(viewDir, halfway1, materialColor);
+    vec3 fre2 = fresnel(viewDir, halfway2, materialColor);
+    if(isF == 0){
+        fre1 = vec3(1.0, 1.0, 1.0);
+        fre2 = vec3(1.0, 1.0, 1.0);
     }
 
     //Sepcular BRDF
-    float specBRDF1 = distribution1 * geometric1/ (4 * dot(lightDir1, norm) * dot(viewDir, norm));
-    float specBRDF2 = distribution2 * geometric2/ (4 * dot(lightDir2, norm) * dot(viewDir, norm));
+    //float specBRDF1 = distribution1 * geometric1/ (4.0 * dot(lightDir1, norm) * dot(viewDir, norm));
+    //float specBRDF2 = distribution2 * geometric2/ (4.0 * dot(lightDir2, norm) * dot(viewDir, norm));
+    vec3 specBRDF1 = distribution1 * geometric1 * fre1/ (4.0 * dot(lightDir1, norm) * dot(viewDir, norm));
+    vec3 specBRDF2 = distribution2 * geometric2 * fre2/ (4.0 * dot(lightDir2, norm) * dot(viewDir, norm));
 
-    float spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
-    float spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
+    vec3 spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
+    //float spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
+    //float spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
+    vec3 spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
     vec3 specular = spec1 * lightIntensities[0] + spec2 * lightIntensities[1];
-
     /*
     vec3 reflectDir = reflect(-lightDir1, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
@@ -106,13 +121,13 @@ float beckmann(vec3 norm, vec3 halfway, float r){
     float tanValue = tan(angle);
     float numerator = pow(E, -(tanValue / r) * (tanValue / r));
 
-    return numerator / (PI * r * r * pow(cosValue, 4));
+    return numerator / (PI * r * r * pow(cosValue, 4.0));
 }
 
 float ggx(vec3 norm, vec3 halfway, float r){
     float alpha = r * r;
     float dotValue = dot(norm, halfway);
-    float temp = dotValue * dotValue * (alpha * alpha - 1) + 1;
+    float temp = dotValue * dotValue * (alpha * alpha - 1.0) + 1.0;
 
     return alpha * alpha / (PI * temp * temp);
 }
@@ -125,7 +140,13 @@ float geometricFunc(vec3 inRay, vec3 outRay, vec3 norm, float r){
 }
 
 float g1Func(float value, float r){
-    float k = (r + 1) * (r + 1) / 8;
+    float k = (r + 1.0) * (r + 1.0) / 8.0;
 
     return value / (value * (1 - k) + k);
+}
+
+vec3 fresnel(vec3 outRay, vec3 halfway, vec3 f_0){
+    float val = dot(outRay, halfway);
+
+    return f_0 + (1.0 - f_0) * (1 - pow(val, 5.0));
 }
