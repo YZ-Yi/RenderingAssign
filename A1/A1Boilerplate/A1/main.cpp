@@ -212,7 +212,7 @@ int main()
             case 5:
                 model = glm::scale(model, glm::vec3(50.f, 50.f, 50.f));
             case 6:
-                model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
+                model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.005f));	// The default vase is a bit too big for our scene, so scale it down
         }
 
 
@@ -417,7 +417,7 @@ void processInput(GLFWwindow* window)
     //F stuff
     if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
         if (!isF)
-            std::cout << "Including H" << std::endl;
+            std::cout << "Including F" << std::endl;
         isF = 1;
     }
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {

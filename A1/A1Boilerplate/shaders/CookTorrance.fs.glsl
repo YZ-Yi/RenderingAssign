@@ -116,7 +116,7 @@ void main()
 }
 
 float beckmann(vec3 norm, vec3 halfway, float r){
-    float angle = acos(dot(norm, halfway));
+    float angle = acos(max(dot(norm, halfway), 0.0));
     float cosValue = cos(angle);
     float tanValue = tan(angle);
     float numerator = pow(E, -(tanValue / r) * (tanValue / r));
@@ -126,15 +126,15 @@ float beckmann(vec3 norm, vec3 halfway, float r){
 
 float ggx(vec3 norm, vec3 halfway, float r){
     float alpha = r * r;
-    float dotValue = dot(norm, halfway);
+    float dotValue = max(dot(norm, halfway), 0.0);
     float temp = dotValue * dotValue * (alpha * alpha - 1.0) + 1.0;
 
     return alpha * alpha / (PI * temp * temp);
 }
 
 float geometricFunc(vec3 inRay, vec3 outRay, vec3 norm, float r){
-    float value1 = dot(norm, inRay);
-    float value2 = dot(norm, outRay);
+    float value1 = max(dot(norm, inRay), 0.0);
+    float value2 = max(dot(norm, outRay), 0.0);
 
     return g1Func(value1, r) * g1Func(value2, r);
 }
