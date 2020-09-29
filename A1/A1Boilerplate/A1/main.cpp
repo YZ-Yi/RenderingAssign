@@ -53,6 +53,7 @@ int isD = 1;
 int isBec = 1;
 int isG = 1;
 int isF = 1;
+int isDeno = 1;
 
 //user interface
 void menu() {
@@ -66,7 +67,8 @@ void menu() {
     std::cout << "c: object color: [0, 1]" << std::endl;
     std::cout << "v: ka: [0, 1]" << std::endl;
     std::cout << "b: ks: [0, 1]" << std::endl;
-    std::cout << "m: select material's color" << std::endl;
+    std::cout << "m: Select material's color" << std::endl;
+    std::cout << "-, =: Include denominator of not" << std::endl;
 }
 
 int main()
@@ -227,6 +229,7 @@ int main()
         ourShader.setInt("isG", isG);
         ourShader.setInt("isF", isF);
         ourShader.setInt("isBec", isBec);
+        ourShader.setInt("isDeno", isDeno);
         
         ourModel.Draw(ourShader);
 
@@ -431,7 +434,7 @@ void processInput(GLFWwindow* window)
         int op = 7;
 
         std::cout << "1. water 2. plastic/glass(low) 3. plastic high 4. glass(high)/ruby 5. diamond 6. iron 7. copper 8. gold 9. aluminium 10. silver" << std::endl;
-        std::cout << "select material's color:";
+        std::cout << "Select material's color:";
         std::cin >> op;
 
         switch (op)
@@ -466,6 +469,18 @@ void processInput(GLFWwindow* window)
             case 10:
                 materialColor = glm::vec3(0.98f, 0.97f, 0.95f);
         }
+    }
+    
+    //denomiator stuff
+    if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+        if (!isDeno)
+            std::cout << "Denominator is on" << std::endl;
+        isDeno = 1;
+    }
+    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
+        if (isDeno)
+            std::cout << "Demominator is off" << std::endl;
+        isDeno = 0;
     }
 }
 

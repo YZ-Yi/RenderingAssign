@@ -20,6 +20,7 @@ uniform int isD;
 uniform int isBec;
 uniform int isG;
 uniform int isF;
+uniform int isDeno;
 
 //Globals
 float PI = 3.141592653589793f;
@@ -95,10 +96,15 @@ void main()
     }
 
     //Sepcular BRDF
-    //float specBRDF1 = distribution1 * geometric1/ (4.0 * dot(lightDir1, norm) * dot(viewDir, norm));
-    //float specBRDF2 = distribution2 * geometric2/ (4.0 * dot(lightDir2, norm) * dot(viewDir, norm));
-    vec3 specBRDF1 = distribution1 * geometric1 * fre1/ (4.0 * dot(lightDir1, norm) * dot(viewDir, norm));
-    vec3 specBRDF2 = distribution2 * geometric2 * fre2/ (4.0 * dot(lightDir2, norm) * dot(viewDir, norm));
+    float deno1 = 4.0 * dot(lightDir1, norm) * dot(viewDir, norm);
+    float deno2 = 4.0 * dot(lightDir2, norm) * dot(viewDir, norm);
+    if(isDeno == 0){
+        deno1 = 1.0;
+        deno2 = 1.0;
+    }
+
+    vec3 specBRDF1 = distribution1 * geometric1 * fre1/ deno1;
+    vec3 specBRDF2 = distribution2 * geometric2 * fre2/ deno2;
 
     vec3 spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
    
