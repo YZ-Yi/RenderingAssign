@@ -101,8 +101,7 @@ void main()
     vec3 specBRDF2 = distribution2 * geometric2 * fre2/ (4.0 * dot(lightDir2, norm) * dot(viewDir, norm));
 
     vec3 spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
-    //float spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
-    //float spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
+   
     vec3 spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
     vec3 specular = spec1 * lightIntensities[0] + spec2 * lightIntensities[1];
     /*
@@ -111,7 +110,7 @@ void main()
     vec3 specular = specularStrength * spec * lightIntensities[0];  
     */
     
-    vec3 result = (ambient + diffuse + specular) * objectColour;
+    vec3 result = ambient + diffuse + specular;
     FragColour = vec4(result, 1.0);
 }
 

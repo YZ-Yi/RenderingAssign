@@ -43,7 +43,7 @@ float rotSpeed = 2.5f;
 //interface stuff
 int modelNum = 6;       //showing vase by default
 float value = 0;
-float roughness = 0; // The roughness of the mesh [0,1]
+float roughness = 0.0001f; // The roughness of the mesh [0,1]
 glm::vec3 objectColour = glm::vec3(0.722, 0.451, 0.2);
 glm::vec3 materialColor = glm::vec3(0.98, 0.82, 0.76);
 float ambientStrength = 1.f;
@@ -317,8 +317,8 @@ void processInput(GLFWwindow* window)
         //if out of range
         if (roughness > 1)
             roughness = 1.f;
-        else if (roughness < 0)
-            roughness = 0.f;
+        else if (roughness <= 0)
+            roughness = 0.0001f;
     }
 
     //object color
