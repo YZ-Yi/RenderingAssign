@@ -53,11 +53,6 @@ void main()
     if(isPi == 1)
         diffuse = diffuse / PI;
 
-    /*
-    vec3 lightDir = normalize(lightPositions[0] - FragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightIntensities[0];
-    */
 
     // specular
     float distribution1, distribution2;
@@ -107,14 +102,8 @@ void main()
     vec3 specBRDF2 = distribution2 * geometric2 * fre2/ deno2;
 
     vec3 spec1 = specBRDF1 * max(dot(norm, lightDir1), 0.0) * specularStrength;
-   
     vec3 spec2 = specBRDF2 * max(dot(norm, lightDir2), 0.0) * specularStrength;
     vec3 specular = spec1 * lightIntensities[0] + spec2 * lightIntensities[1];
-    /*
-    vec3 reflectDir = reflect(-lightDir1, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightIntensities[0];  
-    */
     
     vec3 result = ambient + diffuse + specular;
     FragColour = vec4(result, 1.0);
