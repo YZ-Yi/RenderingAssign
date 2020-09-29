@@ -56,8 +56,7 @@ int isF = 1;
 
 //user interface
 void menu() {
-    std::cout << "Select Models" << std::endl;
-    std::cout << "1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
+    std::cout << "Select Models: 1. Bunny  2. Car  3. Engine  4. Sphere  5. Teapot  6. Vase" << std::endl;
     std::cout << "o, p: Include Pi or not" << std::endl;
     std::cout << "u, i: Include D or not" << std::endl;
     std::cout << "k, l: Include G or not" << std::endl;
@@ -67,6 +66,7 @@ void menu() {
     std::cout << "c: object color: [0, 1]" << std::endl;
     std::cout << "v: ka: [0, 1]" << std::endl;
     std::cout << "b: ks: [0, 1]" << std::endl;
+    std::cout << "m: select material's color" << std::endl;
 }
 
 int main()
@@ -371,24 +371,24 @@ void processInput(GLFWwindow* window)
     //pi
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
         if (isPi == -1)
-            std::cout << "Including Pi" << std::endl;
+            std::cout << "Pi is on" << std::endl;
         isPi = 1;
     }
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
         if (isPi == 1)
-            std::cout << "Excluding Pi" << std::endl;
+            std::cout << "Pi is off" << std::endl;
         isPi = -1;
     }
     
     //D stuff
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
         if (!isD)
-            std::cout << "Including D" << std::endl;
+            std::cout << "D is on" << std::endl;
         isD = 1;
     }
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) {
         if (isD)
-            std::cout << "Excluding D" << std::endl;
+            std::cout << "D is off" << std::endl;
         isD = 0;
     }
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
@@ -405,25 +405,67 @@ void processInput(GLFWwindow* window)
     //G stuff
     if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
         if (!isG)
-            std::cout << "Including G" << std::endl;
+            std::cout << "G is on" << std::endl;
         isG = 1;
     }
     if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
         if (isG)
-            std::cout << "Excluding G" << std::endl;
+            std::cout << "G is off" << std::endl;
         isG = 0;
     }
 
     //F stuff
     if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
         if (!isF)
-            std::cout << "Including F" << std::endl;
+            std::cout << "F is on" << std::endl;
         isF = 1;
     }
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
         if (isF)
-            std::cout << "Excluding F" << std::endl;
+            std::cout << "F is off" << std::endl;
         isF = 0;
+    }
+
+    //material's color
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        int op = 7;
+
+        std::cout << "1. water 2. plastic/glass(low) 3. plastic high 4. glass(high)/ruby 5. diamond 6. iron 7. copper 8. gold 9. aluminium 10. silver" << std::endl;
+        std::cout << "select material's color:";
+        std::cin >> op;
+
+        switch (op)
+        {
+            case 1:
+                materialColor = glm::vec3(0.15f, 0.15f, 0.15f);
+                break;
+            case 2:
+                materialColor = glm::vec3(0.21f, 0.21f, 0.21f);
+                break;
+            case 3:
+                materialColor = glm::vec3(0.24f, 0.24f, 0.24f);
+                break;
+            case 4:
+                materialColor = glm::vec3(0.31f, 0.31f, 0.31f);
+                break;
+            case 5:
+                materialColor = glm::vec3(0.45f, 0.45f, 0.45f);
+                break;
+            case 6:
+                materialColor = glm::vec3(0.77f, 0.78f, 0.78f);
+                break;
+            case 7:
+                materialColor = glm::vec3(0.98f, 0.82f, 0.76f);
+                break;
+            case 8:
+                materialColor = glm::vec3(1.f, 0.86f, 0.57f);
+                break;
+            case 9:
+                materialColor = glm::vec3(0.96f, 0.96f, 0.97f);
+                break;
+            case 10:
+                materialColor = glm::vec3(0.98f, 0.97f, 0.95f);
+        }
     }
 }
 
