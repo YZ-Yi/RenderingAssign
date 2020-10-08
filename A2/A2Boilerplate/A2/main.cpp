@@ -50,8 +50,6 @@ struct Node {
     unsigned int b = 0;                  //back face bit
 };
 
-
-
 int main()
 {
     // glfw: initialize and configure
@@ -110,10 +108,10 @@ int main()
     // -----------
     //Model ourModel("../models/car/car.obj");
     //Model ourModel("../models/engine/engine.obj");
-    Model ourModel("../models/bunny/bunny.obj");
+    //Model ourModel("../models/bunny/bunny.obj");
     //Model ourModel("../models/teapot/teapot.obj");
     //Model ourModel("../models/vase/vase.obj");
-    //Model ourModel("../models/sphere/sphere.obj");
+    Model ourModel("../models/sphere/sphere.obj");
 
     unsigned int numVertices = ourModel.meshes[0].vertices.size();
 
@@ -220,6 +218,8 @@ int main()
         edgeBuffer.push_back(buffer);
     }
 
+    //
+
     //Setup all the outline data to the GPU
     unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
@@ -245,6 +245,8 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        vertices.clear();
+
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -283,7 +285,7 @@ int main()
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-        model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -351,20 +353,20 @@ int main()
                 //Compute centroid of the triangle
                 glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
 
-                glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
+               glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
+                //glm::vec3 viewDirection = glm::vec3(0, 0, 1);
 
-                
                 //If the dotproduct between the centroid and the viewDirection is positive, this triangle is front facing
                 if (glm::dot(triangleNormal, viewDirection) >= 0.0f)
                 {
                     
                     //If this triangle is front facing, we add its 3 vertices to the vertices array
                     //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
-                    /*
+                    
                     vertices.push_back(v0.Position);
                     vertices.push_back(v1.Position);
                     vertices.push_back(v2.Position);
-                   */
+                   
                     for (auto it = (edgeBuffer[i])[i0].begin(); it != (edgeBuffer[i])[i0].end(); ++it) {
                         if ((*it).v == i1) {
                             (*it).f = (*it).f ^ 1;
@@ -415,8 +417,32 @@ int main()
                 }
                 
             }
+/*
+            for (int j = 0; j < 10; ++j) {
+                for (auto& it : edgeBuffer[i][j])
+                    cout << j << " " << it.v << " " << it.f << " " << it.b << endl;
+            }
+            */
         }
 
+        //if the line is silhouette, add it to the vertices
+        for (int i = 0; i < ourModel.meshes.size(); ++i) {
+            Vertex v0, v1;
+
+            for (int j = 0; j < edgeBuffer[i].size(); ++j) {
+                for (auto it = edgeBuffer[i][j].begin(); it != edgeBuffer[i][j].end(); ++it) {
+                    //if front bit and back bit are both 1, which means it is a silhooute
+                    if ((*it).b && (*it).f) {
+                        v0 = ourModel.meshes[i].vertices[i];
+                        v1 = ourModel.meshes[i].vertices[(*it).v];
+                        vertices.push_back(v0.Position);
+                        vertices.push_back(v1.Position);
+                    }
+                }
+            }
+        }
+        
+        cout << vertices.size() << endl;
         //Send all the data to the GPU
         //For you assignment, you need to compute and re-send the vertex data every frame (but the Setup done above only needs to be done once)
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_DYNAMIC_DRAW);
