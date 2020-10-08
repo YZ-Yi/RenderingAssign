@@ -139,9 +139,7 @@ int main()
         size_t numTriangles = ourModel.meshes[i].indices.size() / 3;
         size_t numIndices = ourModel.meshes[i].indices.size();
 
-
         unsigned int i0, i1, i2;
-        Vertex v0, v1, v2;
 
         std::vector<std::list<Node>> buffer;
         for (int j = 0; j < numIndices; j++) {
@@ -217,41 +215,6 @@ int main()
                 buffer[i1].push_back(n);
             }
 
-
-
-            //Get vertices of this triangle using indices
-            v0 = ourModel.meshes[i].vertices[i0];
-            v1 = ourModel.meshes[i].vertices[i1];
-            v2 = ourModel.meshes[i].vertices[i2];
-
-            //Get two edges of the triangle to compute triangle normal
-            glm::vec3 a = v1.Position - v0.Position;
-            glm::vec3 b = v2.Position - v1.Position;
-            glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
-
-            //Compute centroid of the triangle
-            glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
-
-            //We hardcode the viewdirection to be (0, 0, 1) for now so that we can move behind the model and see that the back-facing triangles are not drawn in red
-            glm::vec3 viewDirection = glm::vec3(0, 0, 1);
-            
-            /*
-            //If the dotproduct between the centroid and the viewDirection is positive, this triangle is front facing
-            if (glm::dot(triangleNormal, viewDirection) >= 0.0f)
-            {
-                //If this triangle is front facing, we add its 3 vertices to the vertices array
-                //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
-                vertices.push_back(v0.Position);
-                vertices.push_back(v1.Position);
-                vertices.push_back(v2.Position);
-            }
-            */
-
-        }
-
-        for (int i = 0; i < 10; ++i) {
-            for (auto& it : buffer[i])
-                std::cout << i << " " << it.v << std::endl;
         }
 
         edgeBuffer.push_back(buffer);
@@ -338,6 +301,77 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         ourShader.setMat4("model", model);
+
+        //For each mesh in the .obj (The models included typically have only 1 mesh)
+   //Construct edge buffer
+        for (int i = 0; i < ourModel.meshes.size(); i++)
+        {
+            size_t numTriangles = ourModel.meshes[i].indices.size() / 3;
+
+            unsigned int i0, i1, i2;
+            Vertex v0, v1, v2;
+
+            //For each triangle
+            for (int j = 0; j < numTriangles; j++)
+            {
+                //Get indices of this triangle
+                i0 = ourModel.meshes[i].indices[j * 3 + 0];
+                i1 = ourModel.meshes[i].indices[j * 3 + 1];
+                i2 = ourModel.meshes[i].indices[j * 3 + 2];
+
+                //sort indices
+                if (i0 > i1) {
+                    unsigned int temp = i0;
+                    i0 = i1;
+                    i1 = temp;
+                }
+                if (i0 > i2) {
+                    unsigned int temp = i0;
+                    i0 = i2;
+                    i2 = temp;
+                }
+                if (i1 > i2) {
+                    unsigned int temp = i1;
+                    i1 = i2;
+                    i2 = temp;
+                }
+
+
+                //Get vertices of this triangle using indices
+                v0 = ourModel.meshes[i].vertices[i0];
+                v1 = ourModel.meshes[i].vertices[i1];
+                v2 = ourModel.meshes[i].vertices[i2];
+
+                //Get two edges of the triangle to compute triangle normal
+                glm::vec3 a = v1.Position - v0.Position;
+                glm::vec3 b = v2.Position - v1.Position;
+                glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
+
+                //Compute centroid of the triangle
+                glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
+
+                //We hardcode the viewdirection to be (0, 0, 1) for now so that we can move behind the model and see that the back-facing triangles are not drawn in red
+                glm::vec3 viewDirection = glm::vec3(0, 0, 1);
+
+                
+                //If the dotproduct between the centroid and the viewDirection is positive, this triangle is front facing
+                if (glm::dot(triangleNormal, viewDirection) >= 0.0f)
+                {
+                    //If this triangle is front facing, we add its 3 vertices to the vertices array
+                    //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+                    vertices.push_back(v0.Position);
+                    vertices.push_back(v1.Position);
+                    vertices.push_back(v2.Position);
+                }
+            }
+        }
+
+        //Send all the data to the GPU
+        //For you assignment, you need to compute and re-send the vertex data every frame (but the Setup done above only needs to be done once)
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_DYNAMIC_DRAW);
+
+        glBindVertexArray(0);
+
 
         //draw triangles with line thickness 3.0
         glBindVertexArray(VAO);
