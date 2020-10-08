@@ -45,9 +45,9 @@ float rotSpeed = 2.5f;
 
 //adjacent list
 struct Node {
-    int v;                      //vertex id
-    uint8_t f = 0;                  //front face bit
-    uint8_t b = 0;                  //back face bit
+    unsigned int v;                     //vertex id(index)
+    unsigned int f = 0;                  //front face bit
+    unsigned int b = 0;                  //back face bit
 };
 
 
@@ -240,6 +240,7 @@ int main()
     glBindVertexArray(0);
     
 
+    
     // Infinite render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -350,19 +351,69 @@ int main()
                 //Compute centroid of the triangle
                 glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
 
-                //We hardcode the viewdirection to be (0, 0, 1) for now so that we can move behind the model and see that the back-facing triangles are not drawn in red
-                glm::vec3 viewDirection = glm::vec3(0, 0, 1);
+                glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
 
                 
                 //If the dotproduct between the centroid and the viewDirection is positive, this triangle is front facing
                 if (glm::dot(triangleNormal, viewDirection) >= 0.0f)
                 {
+                    
                     //If this triangle is front facing, we add its 3 vertices to the vertices array
                     //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+                    /*
                     vertices.push_back(v0.Position);
                     vertices.push_back(v1.Position);
                     vertices.push_back(v2.Position);
+                   */
+                    for (auto it = (edgeBuffer[i])[i0].begin(); it != (edgeBuffer[i])[i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+                   
+                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+                        
+                    for (auto it = edgeBuffer[i][i1].begin(); it != edgeBuffer[i][i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+                    
                 }
+                
+                //else, this triangle is back facing
+                else {
+                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+                    }
+                        
+                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+                    }
+                        
+                    for (auto it = edgeBuffer[i][i1].begin(); it != edgeBuffer[i][i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+
+                    }
+                        
+                }
+                
             }
         }
 
