@@ -30,6 +30,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera settings
+//change camera position when observing engine, sphere, vase
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -106,26 +107,20 @@ int main()
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
-    //Model ourModel("../models/car/car.obj");
+    Model ourModel("../models/car/car.obj");
     //Model ourModel("../models/engine/engine.obj");
     //Model ourModel("../models/bunny/bunny.obj");
     //Model ourModel("../models/teapot/teapot.obj");
     //Model ourModel("../models/vase/vase.obj");
     //Model ourModel("../models/sphere/sphere.obj");
-    Model ourModel("../models/pyramid/pyramid.obj");
-    //Model ourModel("../models/pyramid/pyramid - Copy.obj");
-    //Model ourModel("../models/untitled.obj");
-    //Model ourModel("../models/untitled.obj");
-    //Model ourModel("../models/m.obj");
-    //Model ourModel("../models/p.obj");
+    //Model ourModel("../models/pyramid/pyramid.obj");
+
 
     unsigned int numVertices = ourModel.meshes[0].vertices.size();
 
     printf("Meshes: %zu\n", ourModel.meshes.size());
 
-    glm::vec3 test = glm::vec3(1.667, 1, -2.4167);
-    test = glm::normalize(test);
-    cout << test.x << " " << test.y << " " << test.z << endl;
+
 
     //This vector will be ful of 3D points that make up all the triangles of the loaded obj
     std::vector<glm::vec3> vertices;
@@ -135,8 +130,8 @@ int main()
     
     std::vector< std::vector<std::list<Node>>> edgeBuffer;
 
-    for (int i = 0; i < ourModel.meshes[0].vertices.size(); ++i)
-        cout << i << " " <<  ourModel.meshes[0].vertices[i].Position.x << " " << ourModel.meshes[0].vertices[i].Position.y << " " << ourModel.meshes[0].vertices[i].Position.z << endl;
+   // for (int i = 0; i < ourModel.meshes[0].vertices.size(); ++i)
+     //   cout << i << " " <<  ourModel.meshes[0].vertices[i].Position.x << " " << ourModel.meshes[0].vertices[i].Position.y << " " << ourModel.meshes[0].vertices[i].Position.z << endl;
 
     //For each mesh in the .obj (The models included typically have only 1 mesh)
     //Construct edge buffer
@@ -186,7 +181,7 @@ int main()
                 i1 = i2;
                 i2 = temp;
             }
-            cout << i0 << " " << i1 << " " << i2 << endl;
+            //cout << i0 << " " << i1 << " " << i2 << endl;
 
             
             v0 = ourModel.meshes[i].vertices[i0];
@@ -310,14 +305,14 @@ int main()
         ourShader.setMat4("view", view);
         ourShader.setVec3("viewPos", viewPos);
 
-        cout << "-------------------------Camera----------------------------" << endl;
-        cout << camera.Position.x << " " << camera.Position.y << " " << camera.Position.z << endl;
+        //cout << "-------------------------Camera----------------------------" << endl;
+        //cout << camera.Position.x << " " << camera.Position.y << " " << camera.Position.z << endl;
 
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
-        //model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
+        //model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -339,7 +334,7 @@ int main()
 
        // cout << viewPos.x << " " << viewPos.y << " " << viewPos.z << endl;
 
-        cout << "---------------------------Triangles---------------------" << endl;
+        //cout << "---------------------------Triangles---------------------" << endl;
 
         //For each mesh in the .obj (The models included typically have only 1 mesh)
    //Construct edge buffer
@@ -403,13 +398,13 @@ int main()
                 glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
                 //glm::vec3 viewDirection = glm::normalize(glm::vec3(0, 0, 1));
 
-                cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
-                cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
-                cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
-                cout << "normal " << triangleNormal.x << " " << triangleNormal.y << " " << triangleNormal.z << endl;
-                cout << "Dir " << viewDirection.x << " " << viewDirection.y << " " << viewDirection.z << endl;
-                cout << glm::dot(viewDirection, triangleNormal) << endl;
-                cout << "\n\n\n";
+                //cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
+                //cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
+                //cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
+                //cout << "normal " << triangleNormal.x << " " << triangleNormal.y << " " << triangleNormal.z << endl;
+                //cout << "Dir " << viewDirection.x << " " << viewDirection.y << " " << viewDirection.z << endl;
+                //cout << glm::dot(viewDirection, triangleNormal) << endl;
+                //cout << "\n\n\n";
 
                 //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
                 if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
@@ -472,6 +467,7 @@ int main()
                 }
                 
             }
+
             /*
             for (int j = 0; j < 10; ++j) {
                 for (auto& it : edgeBuffer[i][j])
@@ -491,7 +487,7 @@ int main()
                     if ((*it).b && (*it).f) {
                         v0 = ourModel.meshes[i].vertices[j];
                         v1 = ourModel.meshes[i].vertices[(*it).v];
-                        cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
+                        //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
                         vertices.push_back(v0.Position);
                         vertices.push_back(v1.Position);
                     }
@@ -513,9 +509,9 @@ int main()
 
         //draw triangles with line thickness 3.0
         glBindVertexArray(VAO);
-        glPointSize(10);
+        //glPointSize(10);
         glLineWidth(3.0);
-        glDrawArrays(GL_POINTS, 0, vertices.size());
+        //glDrawArrays(GL_POINTS, 0, vertices.size());
         glDrawArrays(GL_LINES, 0, vertices.size());
         glBindVertexArray(0);
 
