@@ -107,16 +107,49 @@ int main()
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
-    Model ourModel("../models/car/car.obj");
-    //Model ourModel("../models/engine/engine.obj");
-    //Model ourModel("../models/bunny/bunny.obj");
-    //Model ourModel("../models/teapot/teapot.obj");
-    //Model ourModel("../models/vase/vase.obj");
-    //Model ourModel("../models/sphere/sphere.obj");
+    Model ourModel1("../models/car/car.obj");
+    Model ourModel2("../models/engine/engine.obj");
+    Model ourModel3("../models/bunny/bunny.obj");
+    Model ourModel4("../models/teapot/teapot.obj");
+    Model ourModel5("../models/vase/vase.obj");
+    Model ourModel6("../models/sphere/sphere.obj");
     //Model ourModel("../models/pyramid/pyramid.obj");
 
+    Model ourModel("../models/sphere/sphere.obj");
 
-    unsigned int numVertices = ourModel.meshes[0].vertices.size();
+    int op = 1;
+    cout << "1.car" << endl;
+    cout << "2.engine" << endl;
+    cout << "3.bunny" << endl;
+    cout << "4,teapot" << endl;
+    cout << "5.vase" << endl;
+    cout << "6.Sphere" << endl;
+    cout << "Select Model:";
+    cin >> op;
+
+    switch (op)
+    {
+        case 1:
+            ourModel = ourModel1;
+            break;
+        case 2:
+            ourModel = ourModel2;
+            break;
+        case 3:
+            ourModel = ourModel3;
+            break;
+        case 4:
+            ourModel = ourModel4;
+            break;
+        case 5:
+            ourModel = ourModel5;
+            break;
+        case 6:
+            ourModel = ourModel6;
+    }
+    
+
+
 
     printf("Meshes: %zu\n", ourModel.meshes.size());
 
@@ -128,115 +161,108 @@ int main()
     //The number of triangles of a mesh is the number of vertex indices / 3
 
     
-    std::vector< std::vector<std::list<Node>>> edgeBuffer;
+    std::vector<std::list<Node>> edgeBuffer;
 
    // for (int i = 0; i < ourModel.meshes[0].vertices.size(); ++i)
      //   cout << i << " " <<  ourModel.meshes[0].vertices[i].Position.x << " " << ourModel.meshes[0].vertices[i].Position.y << " " << ourModel.meshes[0].vertices[i].Position.z << endl;
 
     //For each mesh in the .obj (The models included typically have only 1 mesh)
     //Construct edge buffer
-    for (int i = 0; i < ourModel.meshes.size(); i++)
-    {
+
         //Print information
-        printf("Mesh[%zu]\n", i);
-        printf("\tvertices: %zu\n", ourModel.meshes[i].vertices.size());
-        printf("\tindices: %zu\n\n", ourModel.meshes[i].indices.size());
+    printf("\tvertices: %zu\n", ourModel.meshes[0].vertices.size());
+    printf("\tindices: %zu\n\n", ourModel.meshes[0].indices.size());
 
-        size_t numTriangles = ourModel.meshes[i].indices.size() / 3;
-        size_t numIndices = ourModel.meshes[i].indices.size();
-        size_t numVertices = ourModel.meshes[i].vertices.size();
+    size_t numTriangles = ourModel.meshes[0].indices.size() / 3;
+    size_t numIndices = ourModel.meshes[0].indices.size();
+    size_t numVertices = ourModel.meshes[0].vertices.size();
 
-        unsigned int i0, i1, i2;
-        Vertex v0, v1, v2;
+    unsigned int i0, i1, i2;
+    Vertex v0, v1, v2;
 
-        std::vector<std::list<Node>> buffer;
-        for (unsigned int j = 0; j < numIndices; j++) {
-            list<Node> l;
-            buffer.push_back(l);
-        }
-
-
-        //For each triangle
-        for (unsigned int j = 0; j < numTriangles; j++)
-        {
-            //Get indices of this triangle
-            i0 = ourModel.meshes[i].indices[j * 3 + 0];
-            i1 = ourModel.meshes[i].indices[j * 3 + 1];
-            i2 = ourModel.meshes[i].indices[j * 3 + 2];
-
-
-            //sort indices
-            if (i0 > i1) {
-                unsigned int temp = i0;
-                i0 = i1;
-                i1 = temp;
-            }
-            if (i0 > i2) {
-                unsigned int temp = i0;
-                i0 = i2;
-                i2 = temp;
-            }
-            if (i1 > i2) {
-                unsigned int temp = i1;
-                i1 = i2;
-                i2 = temp;
-            }
-            //cout << i0 << " " << i1 << " " << i2 << endl;
-
-            
-            v0 = ourModel.meshes[i].vertices[i0];
-            v1 = ourModel.meshes[i].vertices[i1];
-            v2 = ourModel.meshes[i].vertices[i2];
-
-            //cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
-            //cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
-            //cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
-
-            //construct edge buffer
-            int isVIn = false;
-            for (auto it = buffer[i0].begin(); it != buffer[i0].end(); ++it) {
-                if ((*it).v == i1) {
-                    isVIn = true;
-                    break;
-                }
-            }
-            if (isVIn == false) {
-                Node n;
-                n.v = i1;
-                buffer[i0].push_back(n);
-            }
-
-            isVIn = false;
-            for (auto it = buffer[i0].begin(); it != buffer[i0].end(); ++it) {
-                if ((*it).v == i2) {
-                    isVIn = true;
-                    break;
-                }
-            }
-            if (isVIn == false) {
-                Node n;
-                n.v = i2;
-                buffer[i0].push_back(n);
-            }
-
-            isVIn = false;
-            for (auto it = buffer[i1].begin(); it != buffer[i1].end(); ++it) {
-                if ((*it).v == i2) {
-                    isVIn = true;
-                    break;
-                }
-            }
-            if (isVIn == false) {
-                Node n;
-                n.v = i2;
-                buffer[i1].push_back(n);
-
-            }
-
-        }
-
-        edgeBuffer.push_back(buffer);
+    for (unsigned int j = 0; j < numIndices; j++) {
+        list<Node> l;
+        edgeBuffer.push_back(l);
     }
+
+
+    //For each triangle
+    for (unsigned int j = 0; j < numTriangles; j++)
+    {
+        //Get indices of this triangle
+        i0 = ourModel.meshes[0].indices[j * 3 + 0];
+        i1 = ourModel.meshes[0].indices[j * 3 + 1];
+        i2 = ourModel.meshes[0].indices[j * 3 + 2];
+
+
+        //sort indices
+        if (i0 > i1) {
+            unsigned int temp = i0;
+            i0 = i1;
+            i1 = temp;
+        }
+        if (i0 > i2) {
+            unsigned int temp = i0;
+            i0 = i2;
+            i2 = temp;
+        }
+        if (i1 > i2) {
+            unsigned int temp = i1;
+            i1 = i2;
+            i2 = temp;
+        }
+        //cout << i0 << " " << i1 << " " << i2 << endl;
+
+
+        v0 = ourModel.meshes[0].vertices[i0];
+        v1 = ourModel.meshes[0].vertices[i1];
+        v2 = ourModel.meshes[0].vertices[i2];
+
+
+
+        //construct edge buffer
+        int isVIn = false;
+        for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+            if ((*it).v == i1) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i1;
+            edgeBuffer[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer[i1].push_back(n);
+
+        }
+
+    }
+
     //
 
     //Setup all the outline data to the GPU
@@ -260,12 +286,10 @@ int main()
     {
         //reset buffer
         vertices.clear();
-        for (int i = 0; i < ourModel.meshes.size(); ++i) {
-            for (int j = 0; j < ourModel.meshes[i].indices.size(); ++j) {
-                for (auto it = edgeBuffer[i][j].begin(); it != edgeBuffer[i][j].end(); ++it) {
-                    (*it).b = 0;
-                    (*it).f = 0;
-                }
+        for (int j = 0; j < ourModel.meshes[0].indices.size(); ++j) {
+            for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                (*it).b = 0;
+                (*it).f = 0;
             }
         }
 
@@ -319,7 +343,7 @@ int main()
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
-        
+
         ourModel.Draw(ourShader);
 
         // Set the current active shader to shader #1
@@ -332,176 +356,170 @@ int main()
         ourShader.setMat4("view", view);
         ourShader.setMat4("model", model);
 
-       // cout << viewPos.x << " " << viewPos.y << " " << viewPos.z << endl;
+        // cout << viewPos.x << " " << viewPos.y << " " << viewPos.z << endl;
 
-        //cout << "---------------------------Triangles---------------------" << endl;
+         //cout << "---------------------------Triangles---------------------" << endl;
 
-        //For each mesh in the .obj (The models included typically have only 1 mesh)
-   //Construct edge buffer
-        for (int i = 0; i < ourModel.meshes.size(); i++)
+         //For each mesh in the .obj (The models included typically have only 1 mesh)
+    //Construct edge buffer
+
+
+        //For each triangle
+        for (int j = 0; j < numTriangles; j++)
         {
-            size_t numTriangles = ourModel.meshes[i].indices.size() / 3;
+            //Get indices of this triangle
+            i0 = ourModel.meshes[0].indices[j * 3 + 0];
+            i1 = ourModel.meshes[0].indices[j * 3 + 1];
+            i2 = ourModel.meshes[0].indices[j * 3 + 2];
 
-            unsigned int i0, i1, i2;
-            Vertex v0, v1, v2;
+            //Get vertices of this triangle using indices
+            v0 = ourModel.meshes[0].vertices[i0];
+            v1 = ourModel.meshes[0].vertices[i1];
+            v2 = ourModel.meshes[0].vertices[i2];
 
-            //For each triangle
-            for (int j = 0; j < numTriangles; j++)
-            {
-                //Get indices of this triangle
-                i0 = ourModel.meshes[i].indices[j * 3 + 0];
-                i1 = ourModel.meshes[i].indices[j * 3 + 1];
-                i2 = ourModel.meshes[i].indices[j * 3 + 2];
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //YOU SHOULD USE THE ORIGIONAL ORDER FROM MESHES TO CALCULATE NORMAL!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //Get two edges of the triangle to compute triangle normal
+            glm::vec3 a = v1.Position - v0.Position;
+            glm::vec3 b = v2.Position - v1.Position;
+            glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
 
-                //Get vertices of this triangle using indices
-                v0 = ourModel.meshes[i].vertices[i0];
-                v1 = ourModel.meshes[i].vertices[i1];
-                v2 = ourModel.meshes[i].vertices[i2];
-
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //YOU SHOULD USE THE ORIGIONAL ORDER FROM MESHES TO CALCULATE NORMAL!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //I WAS SO DUMB !!!!!!!!!!!!!!!!!!!!!!!!!!
-                //Get two edges of the triangle to compute triangle normal
-                glm::vec3 a = v1.Position - v0.Position;
-                glm::vec3 b = v2.Position - v1.Position;
-                glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
-
-                //sort indices
-                if (i0 > i1) {
-                    unsigned int temp = i0;
-                    i0 = i1;
-                    i1 = temp;
-                }
-                if (i0 > i2) {
-                    unsigned int temp = i0;
-                    i0 = i2;
-                    i2 = temp;
-                }
-                if (i1 > i2) {
-                    unsigned int temp = i1;
-                    i1 = i2;
-                    i2 = temp;
-                }
-
-
-                //Get vertices of this triangle using indices
-                v0 = ourModel.meshes[i].vertices[i0];
-                v1 = ourModel.meshes[i].vertices[i1];
-                v2 = ourModel.meshes[i].vertices[i2];
-
-
-                
-
-                //Compute centroid of the triangle
-                glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
-
-                glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
-                //glm::vec3 viewDirection = glm::normalize(glm::vec3(0, 0, 1));
-
-                //cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
-                //cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
-                //cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
-                //cout << "normal " << triangleNormal.x << " " << triangleNormal.y << " " << triangleNormal.z << endl;
-                //cout << "Dir " << viewDirection.x << " " << viewDirection.y << " " << viewDirection.z << endl;
-                //cout << glm::dot(viewDirection, triangleNormal) << endl;
-                //cout << "\n\n\n";
-
-                //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
-                if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
-                {
-                    
-                    //If this triangle is front facing, we add its 3 vertices to the vertices array
-                    //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
-                    
-                    //vertices.push_back(v0.Position);
-                    //vertices.push_back(v1.Position);
-                    //vertices.push_back(v2.Position);
-                   
-                    for (auto it = (edgeBuffer[i])[i0].begin(); it != (edgeBuffer[i])[i0].end(); ++it) {
-                        if ((*it).v == i1) {
-                            (*it).f = (*it).f ^ 1;
-                            break;
-                        }
-                    }
-                   
-                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
-                        if ((*it).v == i2) {
-                            (*it).f = (*it).f ^ 1;
-                            break;
-                        }
-                    }
-                        
-                    for (auto it = edgeBuffer[i][i1].begin(); it != edgeBuffer[i][i1].end(); ++it) {
-                        if ((*it).v == i2) {
-                            (*it).f = (*it).f ^ 1;
-                            break;
-                        }
-                    }
-                    
-                }
-                
-                //else, this triangle is back facing
-                else {
-                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
-                        if ((*it).v == i1) {
-                            (*it).b = (*it).b ^ 1;
-                            break;
-                        }
-                    }
-                        
-                    for (auto it = edgeBuffer[i][i0].begin(); it != edgeBuffer[i][i0].end(); ++it) {
-                        if ((*it).v == i2) {
-                            (*it).b = (*it).b ^ 1;
-                            break;
-                        }
-                    }
-                        
-                    for (auto it = edgeBuffer[i][i1].begin(); it != edgeBuffer[i][i1].end(); ++it) {
-                        if ((*it).v == i2) {
-                            (*it).b = (*it).b ^ 1;
-                            break;
-                        }
-
-                    }
-                        
-                }
-                
+            //sort indices
+            if (i0 > i1) {
+                unsigned int temp = i0;
+                i0 = i1;
+                i1 = temp;
             }
+            if (i0 > i2) {
+                unsigned int temp = i0;
+                i0 = i2;
+                i2 = temp;
+            }
+            if (i1 > i2) {
+                unsigned int temp = i1;
+                i1 = i2;
+                i2 = temp;
+            }
+
+
+            //Get vertices of this triangle using indices
+            v0 = ourModel.meshes[0].vertices[i0];
+            v1 = ourModel.meshes[0].vertices[i1];
+            v2 = ourModel.meshes[0].vertices[i2];
+
+
+
+
+            //Compute centroid of the triangle
+            glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
+
+            glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
+            //glm::vec3 viewDirection = glm::normalize(glm::vec3(0, 0, 1));
+
+            //cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
+            //cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
+            //cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
+            //cout << "normal " << triangleNormal.x << " " << triangleNormal.y << " " << triangleNormal.z << endl;
+            //cout << "Dir " << viewDirection.x << " " << viewDirection.y << " " << viewDirection.z << endl;
+            //cout << glm::dot(viewDirection, triangleNormal) << endl;
+            //cout << "\n\n\n";
+
+            //using algorithm from lec
+            //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
+            if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
+            {
+
+                //If this triangle is front facing, we add its 3 vertices to the vertices array
+                //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+
+                //vertices.push_back(v0.Position);
+                //vertices.push_back(v1.Position);
+                //vertices.push_back(v2.Position);
+
+                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                    if ((*it).v == i1) {
+                        (*it).f = (*it).f ^ 1;
+                        break;
+                    }
+                }
+
+                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                    if ((*it).v == i2) {
+                        (*it).f = (*it).f ^ 1;
+                        break;
+                    }
+                }
+
+                for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                    if ((*it).v == i2) {
+                        (*it).f = (*it).f ^ 1;
+                        break;
+                    }
+                }
+
+            }
+
+            //else, this triangle is back facing
+            else {
+                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                    if ((*it).v == i1) {
+                        (*it).b = (*it).b ^ 1;
+                        break;
+                    }
+                }
+
+                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                    if ((*it).v == i2) {
+                        (*it).b = (*it).b ^ 1;
+                        break;
+                    }
+                }
+
+                for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                    if ((*it).v == i2) {
+                        (*it).b = (*it).b ^ 1;
+                        break;
+                    }
+
+                }
+
+            }
+
+
 
             /*
             for (int j = 0; j < 10; ++j) {
                 for (auto& it : edgeBuffer[i][j])
                     cout << j << " " << it.v << " " << it.f << " " << it.b << endl;
             }
-            
+
             */
         }
-        
-        //if the line is silhouette, add it to the vertices
-        for (int i = 0; i < ourModel.meshes.size(); ++i) {
-            Vertex v0, v1;
 
-            for (int j = 0; j < edgeBuffer[i].size(); ++j) {
-                for (auto it = edgeBuffer[i][j].begin(); it != edgeBuffer[i][j].end(); ++it) {
-                    //if front bit and back bit are both 1, which means it is a silhooute
-                    if ((*it).b && (*it).f) {
-                        v0 = ourModel.meshes[i].vertices[j];
-                        v1 = ourModel.meshes[i].vertices[(*it).v];
-                        //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
-                        vertices.push_back(v0.Position);
-                        vertices.push_back(v1.Position);
-                    }
+        //if the line is silhouette, add it to the vertices
+
+
+        for (int j = 0; j < edgeBuffer.size(); ++j) {
+            for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                //if front bit and back bit are both 1, which means it is a silhooute
+                if ((*it).b && (*it).f) {
+                    v0 = ourModel.meshes[0].vertices[j];
+                    v1 = ourModel.meshes[0].vertices[(*it).v];
+                    //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
+                    vertices.push_back(v0.Position);
+                    vertices.push_back(v1.Position);
                 }
             }
         }
-        
-        
-       // for (int i = 0; i < vertices.size(); ++i)
-         //   cout << i << " " << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
-            
-        //Send all the data to the GPU
-        //cout << vertices.size() << endl;
-        //For you assignment, you need to compute and re-send the vertex data every frame (but the Setup done above only needs to be done once)
+
+
+
+        // for (int i = 0; i < vertices.size(); ++i)
+          //   cout << i << " " << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
+
+         //Send all the data to the GPU
+         //cout << vertices.size() << endl;
+         //For you assignment, you need to compute and re-send the vertex data every frame (but the Setup done above only needs to be done once)
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_DYNAMIC_DRAW);
 
         glBindVertexArray(0);
