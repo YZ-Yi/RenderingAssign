@@ -383,6 +383,7 @@ int main()
             glm::vec3 a = v1.Position - v0.Position;
             glm::vec3 b = v2.Position - v1.Position;
             glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
+            triangleNormal = glm::mat3(rotation) * triangleNormal;
 
             //sort indices
             if (i0 > i1) {
@@ -412,18 +413,10 @@ int main()
 
             //Compute centroid of the triangle
             glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
+            triangleCentroid = glm::mat3(rotation) * triangleCentroid;
 
             glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
-            //glm::vec3 viewDirection = glm::normalize(glm::vec3(0, 0, 1));
-
-            //cout << i0 << " " << v0.Position.x << " " << v0.Position.y << " " << v0.Position.z << endl;
-            //cout << i1 << " " << v1.Position.x << " " << v1.Position.y << " " << v1.Position.z << endl;
-            //cout << i2 << " " << v2.Position.x << " " << v2.Position.y << " " << v2.Position.z << endl;
-            //cout << "normal " << triangleNormal.x << " " << triangleNormal.y << " " << triangleNormal.z << endl;
-            //cout << "Dir " << viewDirection.x << " " << viewDirection.y << " " << viewDirection.z << endl;
-            //cout << glm::dot(viewDirection, triangleNormal) << endl;
-            //cout << "\n\n\n";
-
+          
             //using algorithm from lec
             //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
             if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
@@ -432,9 +425,6 @@ int main()
                 //If this triangle is front facing, we add its 3 vertices to the vertices array
                 //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
 
-                //vertices.push_back(v0.Position);
-                //vertices.push_back(v1.Position);
-                //vertices.push_back(v2.Position);
 
                 for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
                     if ((*it).v == i1) {
