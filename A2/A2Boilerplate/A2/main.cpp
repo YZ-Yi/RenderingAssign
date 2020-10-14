@@ -115,6 +115,7 @@ int main()
     Model ourModel4("../models/teapot/teapot.obj");
     Model ourModel5("../models/vase/vase.obj");
     Model ourModel6("../models/sphere/sphere.obj");
+    Model ourModel7("../models/terrain/terrain.obj");
     //Model ourModel("../models/pyramid/pyramid.obj");
 
     Model ourModel("../models/sphere/sphere.obj");
@@ -125,10 +126,12 @@ int main()
     cout << "3.bunny" << endl;
     cout << "4,teapot" << endl;
     cout << "5.vase" << endl;
-    cout << "6.Sphere" << endl;
+    cout << "6.sphere" << endl;
+    cout << "7.terrain" << endl;
     cout << "Select Model:";
     cin >> op;
 
+    //select model
     switch (op)
     {
         case 1:
@@ -148,6 +151,9 @@ int main()
             break;
         case 6:
             ourModel = ourModel6;
+            break;
+        case 7:
+            ourModel = ourModel7;
     }
     
 
@@ -331,6 +337,8 @@ int main()
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
         //model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
         model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
+        if(op == 7)
+            model = glm::scale(model, glm::vec3(0.0001f, 0.0001f, 0.0001f));
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -387,7 +395,8 @@ int main()
                 glm::vec3 a = v1.Position - v0.Position;
                 glm::vec3 b = v2.Position - v1.Position;
                 glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
-                triangleNormal = glm::mat3(rotation) * triangleNormal;
+                //triangleNormal = glm::mat3(rotation) * triangleNormal;
+                triangleNormal = glm::mat3(model) * triangleNormal;
 
                 //sort indices
                 if (i0 > i1) {
@@ -417,7 +426,8 @@ int main()
 
                 //Compute centroid of the triangle
                 glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
-                triangleCentroid = glm::mat3(rotation) * triangleCentroid;
+               // triangleCentroid = glm::mat3(rotation) * triangleCentroid;
+                triangleCentroid = glm::mat3(model) * triangleCentroid;
 
                 glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
 
