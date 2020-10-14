@@ -44,6 +44,8 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
+int pauseFlag = 0;
+
 //adjacent list
 struct Node {
     unsigned int v;                     //vertex id(index)
@@ -284,15 +286,7 @@ int main()
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        //reset buffer
-        vertices.clear();
-        for (int j = 0; j < ourModel.meshes[0].indices.size(); ++j) {
-            for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
-                (*it).b = 0;
-                (*it).f = 0;
-            }
-        }
-
+        
 
         // per-frame time logic
         // --------------------
@@ -364,140 +358,149 @@ int main()
     //Construct edge buffer
 
 
-        //For each triangle
-        for (int j = 0; j < numTriangles; j++)
-        {
-            //Get indices of this triangle
-            i0 = ourModel.meshes[0].indices[j * 3 + 0];
-            i1 = ourModel.meshes[0].indices[j * 3 + 1];
-            i2 = ourModel.meshes[0].indices[j * 3 + 2];
-
-            //Get vertices of this triangle using indices
-            v0 = ourModel.meshes[0].vertices[i0];
-            v1 = ourModel.meshes[0].vertices[i1];
-            v2 = ourModel.meshes[0].vertices[i2];
-
-            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //YOU SHOULD USE THE ORIGIONAL ORDER FROM MESHES TO CALCULATE NORMAL!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //Get two edges of the triangle to compute triangle normal
-            glm::vec3 a = v1.Position - v0.Position;
-            glm::vec3 b = v2.Position - v1.Position;
-            glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
-            triangleNormal = glm::mat3(rotation) * triangleNormal;
-
-            //sort indices
-            if (i0 > i1) {
-                unsigned int temp = i0;
-                i0 = i1;
-                i1 = temp;
-            }
-            if (i0 > i2) {
-                unsigned int temp = i0;
-                i0 = i2;
-                i2 = temp;
-            }
-            if (i1 > i2) {
-                unsigned int temp = i1;
-                i1 = i2;
-                i2 = temp;
+        if (pauseFlag == 0) {
+            //reset buffer
+            vertices.clear();
+            for (int j = 0; j < ourModel.meshes[0].indices.size(); ++j) {
+                for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                    (*it).b = 0;
+                    (*it).f = 0;
+                }
             }
 
-
-            //Get vertices of this triangle using indices
-            v0 = ourModel.meshes[0].vertices[i0];
-            v1 = ourModel.meshes[0].vertices[i1];
-            v2 = ourModel.meshes[0].vertices[i2];
-
-
-
-
-            //Compute centroid of the triangle
-            glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
-            triangleCentroid = glm::mat3(rotation) * triangleCentroid;
-
-            glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
-          
-            //using algorithm from lec
-            //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
-            if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
+            //For each triangle
+            for (int j = 0; j < numTriangles; j++)
             {
+                //Get indices of this triangle
+                i0 = ourModel.meshes[0].indices[j * 3 + 0];
+                i1 = ourModel.meshes[0].indices[j * 3 + 1];
+                i2 = ourModel.meshes[0].indices[j * 3 + 2];
 
-                //If this triangle is front facing, we add its 3 vertices to the vertices array
-                //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+                //Get vertices of this triangle using indices
+                v0 = ourModel.meshes[0].vertices[i0];
+                v1 = ourModel.meshes[0].vertices[i1];
+                v2 = ourModel.meshes[0].vertices[i2];
 
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //YOU SHOULD USE THE ORIGIONAL ORDER FROM MESHES TO CALCULATE NORMAL!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //Get two edges of the triangle to compute triangle normal
+                glm::vec3 a = v1.Position - v0.Position;
+                glm::vec3 b = v2.Position - v1.Position;
+                glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
+                triangleNormal = glm::mat3(rotation) * triangleNormal;
 
-                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
-                    if ((*it).v == i1) {
-                        (*it).f = (*it).f ^ 1;
-                        break;
-                    }
+                //sort indices
+                if (i0 > i1) {
+                    unsigned int temp = i0;
+                    i0 = i1;
+                    i1 = temp;
+                }
+                if (i0 > i2) {
+                    unsigned int temp = i0;
+                    i0 = i2;
+                    i2 = temp;
+                }
+                if (i1 > i2) {
+                    unsigned int temp = i1;
+                    i1 = i2;
+                    i2 = temp;
                 }
 
-                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
-                    if ((*it).v == i2) {
-                        (*it).f = (*it).f ^ 1;
-                        break;
+
+                //Get vertices of this triangle using indices
+                v0 = ourModel.meshes[0].vertices[i0];
+                v1 = ourModel.meshes[0].vertices[i1];
+                v2 = ourModel.meshes[0].vertices[i2];
+
+
+
+
+                //Compute centroid of the triangle
+                glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
+                triangleCentroid = glm::mat3(rotation) * triangleCentroid;
+
+                glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
+
+                //using algorithm from lec
+                //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
+                if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
+                {
+
+                    //If this triangle is front facing, we add its 3 vertices to the vertices array
+                    //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
                     }
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+
                 }
 
-                for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
-                    if ((*it).v == i2) {
-                        (*it).f = (*it).f ^ 1;
-                        break;
+                //else, this triangle is back facing
+                else {
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
                     }
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+
+                    }
+
                 }
 
+
+
+                /*
+                for (int j = 0; j < 10; ++j) {
+                    for (auto& it : edgeBuffer[i][j])
+                        cout << j << " " << it.v << " " << it.f << " " << it.b << endl;
+                }
+
+                */
             }
 
-            //else, this triangle is back facing
-            else {
-                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
-                    if ((*it).v == i1) {
-                        (*it).b = (*it).b ^ 1;
-                        break;
+            //if the line is silhouette, add it to the vertices
+            for (int j = 0; j < edgeBuffer.size(); ++j) {
+                for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                    //if front bit and back bit are both 1, which means it is a silhooute
+                    if ((*it).b && (*it).f) {
+                        v0 = ourModel.meshes[0].vertices[j];
+                        v1 = ourModel.meshes[0].vertices[(*it).v];
+                        //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
+                        vertices.push_back(v0.Position);
+                        vertices.push_back(v1.Position);
                     }
-                }
-
-                for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
-                    if ((*it).v == i2) {
-                        (*it).b = (*it).b ^ 1;
-                        break;
-                    }
-                }
-
-                for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
-                    if ((*it).v == i2) {
-                        (*it).b = (*it).b ^ 1;
-                        break;
-                    }
-
-                }
-
-            }
-
-
-
-            /*
-            for (int j = 0; j < 10; ++j) {
-                for (auto& it : edgeBuffer[i][j])
-                    cout << j << " " << it.v << " " << it.f << " " << it.b << endl;
-            }
-
-            */
-        }
-
-        //if the line is silhouette, add it to the vertices
-
-
-        for (int j = 0; j < edgeBuffer.size(); ++j) {
-            for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
-                //if front bit and back bit are both 1, which means it is a silhooute
-                if ((*it).b && (*it).f) {
-                    v0 = ourModel.meshes[0].vertices[j];
-                    v1 = ourModel.meshes[0].vertices[(*it).v];
-                    //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
-                    vertices.push_back(v0.Position);
-                    vertices.push_back(v1.Position);
                 }
             }
         }
@@ -534,6 +537,7 @@ int main()
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+
     }
     
 
@@ -594,6 +598,16 @@ void processInput(GLFWwindow* window)
         ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         ProcessKeyboard(RIGHT, deltaTime);
+
+    //Pause updating silhouette or not
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        pauseFlag = 0;
+        cout << "NOT PAUSED" << endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+        pauseFlag = 1;
+        cout << "PAUSED" << endl;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
