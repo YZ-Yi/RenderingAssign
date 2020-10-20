@@ -41,6 +41,8 @@ glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
 int modelNum = 1;
+float b = 1.0;
+float y = 1.0;
 
 int main()
 {
@@ -96,9 +98,13 @@ int main()
     Model ourModel("../models/bunny/bunny.obj");
     Model ourModel1("../models/teapot/teapot.obj");
     Model ourModel2("../models/bunny/bunny.obj");
+
+
     std::cout << "Select Model:" << std::endl;
     std::cout << "1. Teapot\t 2.Bunny" << std::endl;
-    
+    std::cout << "b: enter b value[0.0, 1.0]" << std::endl;
+    std::cout << "y: enter y value[0.0, 1.0]" << std::endl;
+
     //enable this to draw in wireframe
     // -----------
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -155,11 +161,13 @@ int main()
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
         model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
-        glm::vec3 objectColour = glm::vec3(0.7f, 0.f, 0.f);
+        glm::vec3 objectColour = glm::vec3(0.72f, 0.4f, 0.2f);
 
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
+        ourShader.setFloat("b", b);
+        ourShader.setFloat("y", y);
         
         ourModel.Draw(ourShader);
 
@@ -233,6 +241,24 @@ void processInput(GLFWwindow* window)
         modelNum = 1;
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
         modelNum = 2;
+
+    //b and y stuff
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        std::cout << "Enter b value:";
+        std::cin >> b;
+        if (b > 1.0)
+            b = 1.0;
+        if (b < 0.0)
+            b = 0.0;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS) {
+        std::cout << "Enter y value:";
+        std::cin >> y;
+        if (y > 1.0)
+            y = 1.0;
+        if (y < 0.0)
+            y = 0.0;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
