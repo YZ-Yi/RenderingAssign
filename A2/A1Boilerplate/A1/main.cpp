@@ -40,6 +40,7 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
+int modelNum = 1;
 
 int main()
 {
@@ -92,9 +93,12 @@ int main()
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
-    Model ourModel("../models/teapot/teapot.obj");
-   // Model ourModel("../models/bunny/bunny.obj");
-
+    Model ourModel("../models/bunny/bunny.obj");
+    Model ourModel1("../models/teapot/teapot.obj");
+    Model ourModel2("../models/bunny/bunny.obj");
+    std::cout << "Select Model:" << std::endl;
+    std::cout << "1. Teapot\t 2.Bunny" << std::endl;
+    
     //enable this to draw in wireframe
     // -----------
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -117,6 +121,16 @@ int main()
         // ------
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //selec model
+        switch (modelNum)
+        {
+        case 1:
+            ourModel = ourModel1;
+            break;
+        case 2:
+            ourModel = ourModel2;
+        }
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
@@ -213,6 +227,12 @@ void processInput(GLFWwindow* window)
         ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         ProcessKeyboard(RIGHT, deltaTime);
+    
+    //Select models;
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        modelNum = 1;
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        modelNum = 2;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
