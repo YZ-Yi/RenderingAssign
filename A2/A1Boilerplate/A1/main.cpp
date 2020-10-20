@@ -41,8 +41,10 @@ glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
 int modelNum = 1;
-float b = 1.0;
-float y = 1.0;
+float b = 1.f;
+float y = 1.f;
+float alpha = 0.5f;
+float beta = 0.5f;
 
 int main()
 {
@@ -104,6 +106,8 @@ int main()
     std::cout << "1. Teapot\t 2.Bunny" << std::endl;
     std::cout << "b: enter b value[0.0, 1.0]" << std::endl;
     std::cout << "y: enter y value[0.0, 1.0]" << std::endl;
+    std::cout << "z: enter alpha value[0.0, 1.0]" << std::endl;
+    std::cout << "x: enter beta value[0.0, 1.0]" << std::endl;
 
     //enable this to draw in wireframe
     // -----------
@@ -168,6 +172,8 @@ int main()
         ourShader.setVec3("objectColour", objectColour);
         ourShader.setFloat("b", b);
         ourShader.setFloat("y", y);
+        ourShader.setFloat("alpha", alpha);
+        ourShader.setFloat("beta", beta);
         
         ourModel.Draw(ourShader);
 
@@ -258,6 +264,24 @@ void processInput(GLFWwindow* window)
             y = 1.0;
         if (y < 0.0)
             y = 0.0;
+    }
+
+    //alpha and beta stuff
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+        std::cout << "Enter alpha value:";
+        std::cin >> alpha;
+        if (alpha > 1.f)
+            alpha = 1.f;
+        if (alpha < 0.f)
+            alpha = 0.f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+        std::cout << "Enter beta value:";
+        std::cin >> beta;
+        if (beta > 1.f)
+            beta = 1.f;
+        if (beta < 0.f)
+            beta = 0.f;
     }
 }
 
