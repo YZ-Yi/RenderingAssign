@@ -9,3 +9,6 @@ CONTROLS:
 WASD - Move camera
 Scroll wheel - Zoom in/out
 Arrow keys - rotate model
+
+
+Please re run the code if you want to change models.
