@@ -93,6 +93,7 @@ int main()
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
     Model ourModel("../models/teapot/teapot.obj");
+   // Model ourModel("../models/bunny/bunny.obj");
 
     //enable this to draw in wireframe
     // -----------
@@ -140,7 +141,7 @@ int main()
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
         model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
-        glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
+        glm::vec3 objectColour = glm::vec3(0.7f, 0.f, 0.f);
 
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);

@@ -21,17 +21,16 @@ void main()
     // diffuse 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPositions[0] - FragPos);
-    float diff = max(dot(norm, lightDir), 0.0);
+    float diff = dot(norm, lightDir);
     float alpha = 0.5;
     float beta = 0.5;
     vec3 diffuseStrength = vec3(0.7, 0.0, 0.0);
-    vec3 coolVal = vec3(0.0, 0.0, 1.0) + alpha * diffuseStrength;
-    vec3 warmVal = vec3(1.0, 1.0, 0.0) + beta * diffuseStrength;
-    vec3 diffuse =(1.0 +  (1.0 + diff) / 2.0) * coolVal +  (1.0  + (1 - diff) / 2.0) * warmVal;
+    vec3 coolVal = vec3(0.0, 0.0, 1.0) + alpha * objectColour;
+    vec3 warmVal = vec3(1.0, 1.0, 0.0) + beta * objectColour;
+    vec3 diffuse = (1.0 + diff) / 2.0 * coolVal +  (1.0  - (1 + diff) / 2.0) * warmVal;
+    //vec3 diffuse = lightIntensities[0] * diff; 
 
 
-
-    
     // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
