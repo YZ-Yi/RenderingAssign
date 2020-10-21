@@ -16,6 +16,8 @@
 #include "Model.h"
 
 #include <iostream>
+#include <list>
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -40,11 +42,19 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
-int modelNum = 1;
+int modelNum = 0;
 float b = 1.f;
 float y = 1.f;
 float alpha = 0.5f;
 float beta = 0.5f;
+int pauseFlag = 0;
+
+//adjacent list
+struct Node {
+    unsigned int v;                     //vertex id(index)
+    unsigned int f = 0;                  //front face bit
+    unsigned int b = 0;                  //back face bit
+};
 
 int main()
 {
@@ -94,10 +104,12 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader ourShader("../shaders/Phong.vs.glsl", "../shaders/Phong.fs.glsl");
+    Shader ourShader2("../shaders/outline.vs", "../shaders/outline.fs");
+
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
-    Model ourModel("../models/bunny/bunny.obj");
+    Model ourModel("../models/teapot/teapot.obj");
     Model ourModel1("../models/teapot/teapot.obj");
     Model ourModel2("../models/bunny/bunny.obj");
 
@@ -108,10 +120,216 @@ int main()
     std::cout << "y: enter y value[0.0, 1.0]" << std::endl;
     std::cout << "z: enter alpha value[0.0, 1.0]" << std::endl;
     std::cout << "x: enter beta value[0.0, 1.0]" << std::endl;
+    std::cout << "j: rendering silhouette" << std::endl;
+    std::cout << "k: not rendering silhouette" << std::endl;
+    
 
     //enable this to draw in wireframe
     // -----------
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    //This vector will be ful of 3D points that make up all the triangles of the loaded obj
+    std::vector<glm::vec3> vertices;
+
+    //The number of triangles of a mesh is the number of vertex indices / 3
+
+    std::vector<std::list<Node>> edgeBuffer;
+    std::vector<std::list<Node>> edgeBuffer1;
+    std::vector<std::list<Node>> edgeBuffer2;
+
+    
+
+    //load teapot edge buffer
+    for (unsigned int j = 0; j < ourModel1.meshes[0].indices.size(); j++) {
+        list<Node> l;
+        edgeBuffer1.push_back(l);
+    }
+
+
+    for (unsigned int j = 0; j < ourModel1.meshes[0].indices.size() / 3; j++)
+    {
+        size_t numTriangles = ourModel1.meshes[0].indices.size() / 3;
+        size_t numIndices = ourModel1.meshes[0].indices.size();
+        size_t numVertices = ourModel1.meshes[0].vertices.size();
+
+        unsigned int i0, i1, i2;
+        Vertex v0, v1, v2;
+        //Get indices of this triangle
+        i0 = ourModel1.meshes[0].indices[j * 3 + 0];
+        i1 = ourModel1.meshes[0].indices[j * 3 + 1];
+        i2 = ourModel1.meshes[0].indices[j * 3 + 2];
+
+
+        //sort indices
+        if (i0 > i1) {
+            unsigned int temp = i0;
+            i0 = i1;
+            i1 = temp;
+        }
+        if (i0 > i2) {
+            unsigned int temp = i0;
+            i0 = i2;
+            i2 = temp;
+        }
+        if (i1 > i2) {
+            unsigned int temp = i1;
+            i1 = i2;
+            i2 = temp;
+        }
+        //cout << i0 << " " << i1 << " " << i2 << endl;
+
+
+        v0 = ourModel1.meshes[0].vertices[i0];
+        v1 = ourModel1.meshes[0].vertices[i1];
+        v2 = ourModel1.meshes[0].vertices[i2];
+
+
+
+        //construct edge buffer
+        int isVIn = false;
+        for (auto it = edgeBuffer1[i0].begin(); it != edgeBuffer1[i0].end(); ++it) {
+            if ((*it).v == i1) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i1;
+            edgeBuffer1[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer1[i0].begin(); it != edgeBuffer1[i0].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer1[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer1[i1].begin(); it != edgeBuffer1[i1].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer1[i1].push_back(n);
+
+        }
+
+    }
+
+    //load bunny edge buffer
+    for (unsigned int j = 0; j < ourModel2.meshes[0].indices.size(); j++) {
+        list<Node> l;
+        edgeBuffer2.push_back(l);
+    }
+
+
+    for (unsigned int j = 0; j < ourModel2.meshes[0].indices.size() / 3; j++)
+    {
+        size_t numTriangles = ourModel2.meshes[0].indices.size() / 3;
+        size_t numIndices = ourModel2.meshes[0].indices.size();
+        size_t numVertices = ourModel2.meshes[0].vertices.size();
+
+        unsigned int i0, i1, i2;
+        Vertex v0, v1, v2;
+        //Get indices of this triangle
+        i0 = ourModel2.meshes[0].indices[j * 3 + 0];
+        i1 = ourModel2.meshes[0].indices[j * 3 + 1];
+        i2 = ourModel2.meshes[0].indices[j * 3 + 2];
+
+
+        //sort indices
+        if (i0 > i1) {
+            unsigned int temp = i0;
+            i0 = i1;
+            i1 = temp;
+        }
+        if (i0 > i2) {
+            unsigned int temp = i0;
+            i0 = i2;
+            i2 = temp;
+        }
+        if (i1 > i2) {
+            unsigned int temp = i1;
+            i1 = i2;
+            i2 = temp;
+        }
+        //cout << i0 << " " << i1 << " " << i2 << endl;
+
+
+        v0 = ourModel2.meshes[0].vertices[i0];
+        v1 = ourModel2.meshes[0].vertices[i1];
+        v2 = ourModel2.meshes[0].vertices[i2];
+
+
+
+        //construct edge buffer
+        int isVIn = false;
+        for (auto it = edgeBuffer2[i0].begin(); it != edgeBuffer2[i0].end(); ++it) {
+            if ((*it).v == i1) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i1;
+            edgeBuffer2[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer2[i0].begin(); it != edgeBuffer2[i0].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer2[i0].push_back(n);
+        }
+
+        isVIn = false;
+        for (auto it = edgeBuffer2[i1].begin(); it != edgeBuffer2[i1].end(); ++it) {
+            if ((*it).v == i2) {
+                isVIn = true;
+                break;
+            }
+        }
+        if (isVIn == false) {
+            Node n;
+            n.v = i2;
+            edgeBuffer2[i1].push_back(n);
+
+        }
+
+    }
+
+    edgeBuffer = edgeBuffer1;
+
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Infinite render loop
     // -----------
@@ -137,14 +355,20 @@ int main()
         {
         case 1:
             ourModel = ourModel1;
+            edgeBuffer = edgeBuffer1;
             break;
         case 2:
             ourModel = ourModel2;
+            edgeBuffer = edgeBuffer2;
         }
+
+
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
-      
+        // This shader will have filled-in triangles
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        
         //LIGHTS
         glm::vec3 lightPositions[2] = { glm::vec3(0.f, 0.f, 2.f), glm::vec3(-2.f, -1.f, 2.f) };
         glm::vec3 lightIntensities[2] = { glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f) };
@@ -176,6 +400,184 @@ int main()
         ourShader.setFloat("beta", beta);
         
         ourModel.Draw(ourShader);
+
+
+        
+        if (!pauseFlag) {
+            // Set the current active shader to shader #1
+            ourShader2.use();
+            // This shader will not have filled-in triangles
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+            //Send vertex shader data
+            ourShader2.setMat4("projection", projection);
+            ourShader2.setMat4("view", view);
+            ourShader2.setMat4("model", model);
+
+            //reset edge buffer and other
+            vertices.clear();
+            for (int j = 0; j < ourModel.meshes[0].indices.size(); ++j) {
+                for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                    (*it).b = 0;
+                    (*it).f = 0;
+                }
+            }
+
+            //For each triangle
+            size_t numTriangles = ourModel.meshes[0].indices.size() / 3;
+            for (int j = 0; j < numTriangles; j++)
+            {
+                unsigned int i0, i1, i2;
+                Vertex v0, v1, v2;
+                //Get indices of this triangle
+                i0 = ourModel.meshes[0].indices[j * 3 + 0];
+                i1 = ourModel.meshes[0].indices[j * 3 + 1];
+                i2 = ourModel.meshes[0].indices[j * 3 + 2];
+
+                //Get vertices of this triangle using indices
+                v0 = ourModel.meshes[0].vertices[i0];
+                v1 = ourModel.meshes[0].vertices[i1];
+                v2 = ourModel.meshes[0].vertices[i2];
+
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //YOU SHOULD USE THE ORIGIONAL ORDER FROM MESHES TO CALCULATE NORMAL!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //Get two edges of the triangle to compute triangle normal
+                glm::vec3 a = v1.Position - v0.Position;
+                glm::vec3 b = v2.Position - v1.Position;
+                glm::vec3 triangleNormal = glm::normalize(glm::cross(a, b));
+                //triangleNormal = glm::mat3(rotation) * triangleNormal;
+                triangleNormal = glm::mat3(model) * triangleNormal;
+
+                //sort indices
+                if (i0 > i1) {
+                    unsigned int temp = i0;
+                    i0 = i1;
+                    i1 = temp;
+                }
+                if (i0 > i2) {
+                    unsigned int temp = i0;
+                    i0 = i2;
+                    i2 = temp;
+                }
+                if (i1 > i2) {
+                    unsigned int temp = i1;
+                    i1 = i2;
+                    i2 = temp;
+                }
+
+
+                //Get vertices of this triangle using indices
+                v0 = ourModel.meshes[0].vertices[i0];
+                v1 = ourModel.meshes[0].vertices[i1];
+                v2 = ourModel.meshes[0].vertices[i2];
+
+
+                //Compute centroid of the triangle
+                glm::vec3 triangleCentroid = (v0.Position + v1.Position + v2.Position) / 3.f;
+                // triangleCentroid = glm::mat3(rotation) * triangleCentroid;
+                triangleCentroid = glm::mat3(model) * triangleCentroid;
+
+                glm::vec3 viewDirection = glm::normalize(triangleCentroid - viewPos);
+
+                //using algorithm from lec
+                //If the dotproduct between the centroid and the viewDirection is , this triangle is front facing
+                if (glm::dot(triangleNormal, viewDirection) <= 0.0f)
+                {
+
+                    //If this triangle is front facing, we add its 3 vertices to the vertices array
+                    //Note that for your assignment, you need to reset the vertices array each frame, and compute all of this inside the infinite loop below
+
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).f = (*it).f ^ 1;
+                            break;
+                        }
+                    }
+
+                }
+                //else, this triangle is back facing
+                else {
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i1) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i0].begin(); it != edgeBuffer[i0].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+                    }
+
+                    for (auto it = edgeBuffer[i1].begin(); it != edgeBuffer[i1].end(); ++it) {
+                        if ((*it).v == i2) {
+                            (*it).b = (*it).b ^ 1;
+                            break;
+                        }
+
+                    }
+
+                }
+
+
+
+                /*
+                for (int j = 0; j < 10; ++j) {
+                    for (auto& it : edgeBuffer[j])
+                        cout << j << " " << it.v << " " << it.f << " " << it.b << endl;
+                }
+
+                */
+            }
+
+            //if the line is silhouette, add it to the vertices
+            for (int j = 0; j < edgeBuffer.size(); ++j) {
+                Vertex v0, v1;
+                for (auto it = edgeBuffer[j].begin(); it != edgeBuffer[j].end(); ++it) {
+                    //if front bit and back bit are both 1, which means it is a silhooute
+                    if ((*it).b && (*it).f) {
+                        v0 = ourModel.meshes[0].vertices[j];
+                        v1 = ourModel.meshes[0].vertices[(*it).v];
+                        //cout << j << " "  << (*it).v << " " << (*it).b << " " << (*it).f << endl;
+                        vertices.push_back(v0.Position);
+                        vertices.push_back(v1.Position);
+                    }
+                }
+            }
+            //std::cout << vertices.size() << std::endl;
+            // std::cout << edgeBuffer.size() << std::endl;
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_DYNAMIC_DRAW);
+
+            glBindVertexArray(0);
+
+
+            //draw triangles with line thickness 3.0
+            glBindVertexArray(VAO);
+            //glPointSize(10);
+            glLineWidth(3.0);
+            //glDrawArrays(GL_POINTS, 0, vertices.size());
+            glDrawArrays(GL_LINES, 0, vertices.size());
+            glBindVertexArray(0);
+        }
+
+        
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -282,6 +684,16 @@ void processInput(GLFWwindow* window)
             beta = 1.f;
         if (beta < 0.f)
             beta = 0.f;
+    }
+
+    //Pause updating silhouette or not
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        pauseFlag = 0;
+        cout << "redering silhouette" << endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
+        pauseFlag = 1;
+        cout << "not rendering silhouette" << endl;
     }
 }
 
