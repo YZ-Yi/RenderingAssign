@@ -48,6 +48,7 @@ float y = 1.f;
 float alpha = 0.5f;
 float beta = 0.5f;
 int pauseFlag = 0;
+glm::vec3 objectColour = glm::vec3(0.7f, 0.f, 0.f);
 
 //adjacent list
 struct Node {
@@ -120,9 +121,9 @@ int main()
     std::cout << "y: enter y value[0.0, 1.0]" << std::endl;
     std::cout << "z: enter alpha value[0.0, 1.0]" << std::endl;
     std::cout << "x: enter beta value[0.0, 1.0]" << std::endl;
+    std::cout << "l: enter object colour" << std::endl;
     std::cout << "j: rendering silhouette" << std::endl;
     std::cout << "k: not rendering silhouette" << std::endl;
-    
 
     //enable this to draw in wireframe
     // -----------
@@ -389,7 +390,6 @@ int main()
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
         model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
-        glm::vec3 objectColour = glm::vec3(0.72f, 0.4f, 0.2f);
 
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
@@ -563,6 +563,9 @@ int main()
             }
             //std::cout << vertices.size() << std::endl;
             // std::cout << edgeBuffer.size() << std::endl;
+            
+            //-------------------------------------------------------------------------
+            //the following code was provided to the class by my TA(Alejandro Garcia)
             glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), vertices.data(), GL_DYNAMIC_DRAW);
 
             glBindVertexArray(0);
@@ -575,6 +578,7 @@ int main()
             //glDrawArrays(GL_POINTS, 0, vertices.size());
             glDrawArrays(GL_LINES, 0, vertices.size());
             glBindVertexArray(0);
+            //-----------------end of TA's code -------------------------------------------
         }
 
         
@@ -685,6 +689,28 @@ void processInput(GLFWwindow* window)
         if (beta < 0.f)
             beta = 0.f;
     }
+
+    //obect colour
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        float red, green, blue;
+        std::cout << "Enter object color:";
+        std::cin >> red >> green >> blue;
+        if (red > 1.f)
+            red = 1.f;
+        if (red < 0.f)
+            red = 0.f;
+        if (green > 1.f)
+            green = 1.f;
+        if (green < 0.f)
+            green = 1.f;
+        if (blue > 1.f)
+            blue = 1.f;
+        if (blue < 0.f)
+            blue = 0.f;
+
+        objectColour = glm::vec3(red, green, blue);
+    }
+
 
     //Pause updating silhouette or not
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
