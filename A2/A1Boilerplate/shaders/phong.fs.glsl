@@ -14,6 +14,7 @@ uniform float b;
 uniform float y;
 uniform float alpha;
 uniform float beta;
+uniform int speFlag;
 
 void main()
 {   
@@ -24,20 +25,21 @@ void main()
     // diffuse 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPositions[0] - FragPos);
-    float diff = dot(norm, lightDir);
-    vec3 diffuseStrength = vec3(0.7, 0.0, 0.0);
+    float diff = dot(norm, -lightDir);
     vec3 coolVal = vec3(0.0, 0.0, b) + alpha * objectColour;
     vec3 warmVal = vec3(y, y, 0.0) + beta * objectColour;
-    vec3 diffuse = (1.0 + diff) / 2.0 * coolVal +  (1.0  - (1 + diff) / 2.0) * warmVal;
+    float val = (1.0 + diff) / 2.0;
+    vec3 diffuse = val * coolVal +  (1.0  - val) * warmVal;
 
 
     // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
     vec3 specular = specularStrength * spec * lightIntensities[0];  
-        
-    vec3 result = (ambient + diffuse + specular) * objectColour;
+    
+
+    vec3 result = diffuse;
     FragColour = vec4(result, 1.0);
 }

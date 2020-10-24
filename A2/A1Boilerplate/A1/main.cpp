@@ -49,6 +49,7 @@ float alpha = 0.5f;
 float beta = 0.5f;
 int pauseFlag = 0;
 glm::vec3 objectColour = glm::vec3(0.7f, 0.f, 0.f);
+int speFlag = 1;
 
 //adjacent list
 struct Node {
@@ -398,6 +399,7 @@ int main()
         ourShader.setFloat("y", y);
         ourShader.setFloat("alpha", alpha);
         ourShader.setFloat("beta", beta);
+        ourShader.setInt("speFlag", speFlag);
         
         ourModel.Draw(ourShader);
 
@@ -405,14 +407,14 @@ int main()
         
         if (!pauseFlag) {
             // Set the current active shader to shader #1
-            ourShader2.use();
+            //ourShader2.use();
             // This shader will not have filled-in triangles
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
             //Send vertex shader data
-            ourShader2.setMat4("projection", projection);
-            ourShader2.setMat4("view", view);
-            ourShader2.setMat4("model", model);
+            //ourShader2.setMat4("projection", projection);
+            //ourShader2.setMat4("view", view);
+            //ourShader2.setMat4("model", model);
 
             //reset edge buffer and other
             vertices.clear();
@@ -702,7 +704,7 @@ void processInput(GLFWwindow* window)
         if (green > 1.f)
             green = 1.f;
         if (green < 0.f)
-            green = 1.f;
+            green = 0.f;
         if (blue > 1.f)
             blue = 1.f;
         if (blue < 0.f)
@@ -721,6 +723,11 @@ void processInput(GLFWwindow* window)
         pauseFlag = 1;
         cout << "not rendering silhouette" << endl;
     }
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        speFlag = 1;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        speFlag = 0;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
