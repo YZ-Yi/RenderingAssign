@@ -40,6 +40,7 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
+int activeTex = 0;
 
 int main()
 {
@@ -133,6 +134,9 @@ int main()
     // -----------
     Model ourModel("../models/head.obj");
 
+    std::string texPaths[] = { "../textures/material1.bmp", "../textures/material2.bmp", "../textures/aerial1.bmp", "../textures/aerial2.bmp" };
+    unsigned int textures[4];
+
     //The following block-of-code was adapted from code
     //I found at the following URL:
     //https://learnopengl.com/Getting-started/Textures
@@ -141,32 +145,32 @@ int main()
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
 
-    unsigned int texture1, texture2;
-    // texture 1
-    // ---------
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char* data = stbi_load("../textures/material1.bmp", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
+    for (int i = 0; i < 4; ++i) {
+        // ---------
+        glGenTextures(1, &textures[i]);
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        // set the texture wrapping parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // load image, create texture and generate mipmaps
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+        unsigned char* data = stbi_load(texPaths[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else
+        {
+            std::cout << "Failed to load texture " << i << std::endl;
+        }
+        stbi_image_free(data);
+
     }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
 
 
 
@@ -196,12 +200,10 @@ int main()
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        glBindTexture(GL_TEXTURE_2D, textures[activeTex]);
 
 
         // don't forget to enable shader before setting uniforms
@@ -304,6 +306,16 @@ void processInput(GLFWwindow* window)
         ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         ProcessKeyboard(RIGHT, deltaTime);
+
+    //Select textures
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        activeTex = 0;
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        activeTex = 1;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        activeTex = 2;
+    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+        activeTex = 3;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
