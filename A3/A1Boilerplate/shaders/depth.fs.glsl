@@ -18,18 +18,19 @@ void main()
 {   
     vec2 TexCoords;
 	float rVal = 1.0;
-  	
+  	float z_min = 1.0;
+
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPositions - FragPos);
     vec3 viewDir = normalize(viewPos - FragPos);
 
     //diffuse
-    float s = max(dot(norm, lightDir), 0.00);
-    //float s = dot(norm, lightDir);
+    //float s = max(dot(norm, lightDir), 0.00);
+    float s = max(dot(norm, lightDir), 0);
+    float z_max = rVal * z_min;
 
-    float t = max(dot(norm, viewDir), 0.00);
-    //float t = dot(norm, viewDir);
-    t = pow(t, rVal);
+    float t = 1 - log(s / z_min) / log(z_max / z_min);
+
     TexCoords = vec2(s, t); 
         
     FragColour = texture(texture1, TexCoords);

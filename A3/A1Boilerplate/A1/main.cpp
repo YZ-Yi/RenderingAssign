@@ -40,6 +40,7 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
+glm::vec3 lightPositions = glm::vec3(0.f, 1.f, 0.f);
 int activeTex = 0;
 
 int main()
@@ -129,9 +130,12 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
+    //Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
+    Model sphereModel("../models/sphere.obj");
+   // Model ourModel("../models/terrain-1.obj");
     Model ourModel("../models/head.obj");
 
     std::string texPaths[] = { "../textures/material1.bmp", "../textures/material2.bmp", "../textures/aerial1.bmp", "../textures/aerial2.bmp" };
@@ -223,10 +227,9 @@ int main()
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
         //LIGHTS
-        glm::vec3 lightPositions[2] = { glm::vec3(0.f, 0.f, 2.f), glm::vec3(-2.f, -1.f, 2.f) };
-        glm::vec3 lightIntensities[2] = { glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f) };
-        glUniform3fv(glGetUniformLocation(ourShader.ID, "lightPositions"), 2, glm::value_ptr(lightPositions[0]));
-        glUniform3fv(glGetUniformLocation(ourShader.ID, "lightIntensities"), 2, glm::value_ptr(lightIntensities[0]));
+        glm::vec3 lightIntensities = glm::vec3(1.f, 1.f, 1.f);
+        ourShader.setVec3("lightPositions", lightPositions);
+        ourShader.setVec3("lightIntensities", lightIntensities);
 
 
         //CAMERA
@@ -240,8 +243,9 @@ int main()
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-       // model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
+        //model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
+        //model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -251,6 +255,11 @@ int main()
         
         ourModel.Draw(ourShader);
 
+        //show lights position
+        glm::mat4 lightModel = glm::translate(glm::mat4(1.0f), lightPositions);
+        lightModel = glm::scale(lightModel, glm::vec3(0.1, 0.1, 0.1));
+        ourShader.setMat4("model", lightModel);
+        sphereModel.Draw(ourShader);
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -326,6 +335,20 @@ void processInput(GLFWwindow* window)
         activeTex = 2;
     if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
         activeTex = 3;
+
+    //Light position controls
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+        lightPositions += glm::vec3(0.f, 0.1f, 0.f);
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+        lightPositions += glm::vec3(0.f, -0.1f, 0.f);
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+        lightPositions += glm::vec3(-0.1f, 0.f, 0.f);
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        lightPositions += glm::vec3(0.1f, 0.f, 0.f);
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+        lightPositions += glm::vec3(0.f, 0.f, 0.1f);
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        lightPositions += glm::vec3(0.f, 0.f, -0.1f);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
