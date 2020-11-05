@@ -81,7 +81,7 @@ int main()
     }
 
 
-
+    /*
     //-----------Test Textures-------------------------------
     float vertices[] = {
         0.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
@@ -116,7 +116,7 @@ int main()
     // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-
+    */
 
     //----------------------test ends here------------------------------------------------------------
 
@@ -143,7 +143,6 @@ int main()
     //load and create texture
     //-------------------------------------------------------------------------------
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
 
     for (int i = 0; i < 4; ++i) {
         // ---------
@@ -172,10 +171,20 @@ int main()
 
     }
 
-
-
     //-----------------------end of attributed code-----------------------------------
 
+    //Setup all the outline data to the GPU
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     //enable this to draw in wireframe
     // -----------
@@ -211,8 +220,8 @@ int main()
       
         glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        /*
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
         //LIGHTS
         glm::vec3 lightPositions[2] = { glm::vec3(0.f, 0.f, 2.f), glm::vec3(-2.f, -1.f, 2.f) };
         glm::vec3 lightIntensities[2] = { glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f) };
@@ -231,6 +240,7 @@ int main()
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
+       // model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
@@ -241,7 +251,7 @@ int main()
         
         ourModel.Draw(ourShader);
 
-        */
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
