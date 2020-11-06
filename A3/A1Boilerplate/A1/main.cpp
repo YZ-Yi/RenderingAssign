@@ -43,6 +43,9 @@ float rotSpeed = 2.5f;
 glm::vec3 lightPositions = glm::vec3(0.f, 0.f, 10.f);
 int activeTex = 0;
 float rVal = 1.f;
+float z_min = 0.002f;
+int activeModel = 1;
+int activeShader = 1;
 
 int main()
 {
@@ -90,16 +93,21 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    //Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
-    //Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
-    Shader ourShader("../shaders/pm.vs.glsl", "../shaders/pm.fs.glsl");
+    Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
+    Shader ourShader1("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
+    Shader ourShader2("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
+    Shader ourShader3("../shaders/pm.vs.glsl", "../shaders/pm.fs.glsl");
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
     Model sphereModel("../models/sphere.obj");
-    //Model ourModel("../models/terrain-3.obj");
-    //Model ourModel("../models/head.obj");
-    Model ourModel("../models/boss.obj");
+    Model ourModel("../models/head.obj");
+    Model ourModel1("../models/head.obj");
+    Model ourModel2("../models/boss.obj");
+    Model ourModel3("../models/bunny.obj");
+    Model ourModel4("../models/terrain-1.obj");
+    Model ourModel5("../models/terrain-2.obj");
+    Model ourModel6("../models/terrain-3.obj");
 
     std::string texPaths[] = { "../textures/material1.png", "../textures/material2.png", "../textures/aerial1.png", "../textures/aerial2.png" };
     unsigned int textures[4];
@@ -171,6 +179,30 @@ int main()
         // -----
         processInput(window);
 
+        //load model
+        switch (activeModel)
+        {
+        case 1:
+            ourModel = ourModel1;
+            break;
+        case 2:
+            ourModel = ourModel2;
+            break;
+        case 3:
+            ourModel = ourModel3;
+            break;
+        case 4:
+            ourModel = ourModel4;
+            break;
+        case 5:
+            ourModel = ourModel5;
+            break;
+        case 6:
+            ourModel = ourModel6;
+            break;
+        }
+
+
         // Clear screen
         // ------
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -194,7 +226,6 @@ int main()
         ourShader.setVec3("lightPositions", lightPositions);
         ourShader.setVec3("lightIntensities", lightIntensities);
 
-
         //CAMERA
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -202,13 +233,19 @@ int main()
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         ourShader.setVec3("viewPos", viewPos);
+        ourShader.setInt("shaderNum", activeShader);
 
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-        model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
-        //model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// head
-        //model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// terrain
+        if(activeModel == 1)
+            model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// head
+        else if(activeModel == 3)
+            model = glm::scale(model, glm::vec3(10.f, 10.f, 10.f));	// bunny
+        else if(activeModel >= 4)
+            model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// terrain
+        else
+            model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
@@ -216,6 +253,7 @@ int main()
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
         ourShader.setFloat("rVal", rVal);
+        ourShader.setFloat("z_min", z_min);
         
         ourModel.Draw(ourShader);
 
@@ -300,6 +338,34 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
         activeTex = 3;
 
+    //Select model
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        activeModel = 1;
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+        activeModel = 2;
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+        activeModel = 3;
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+        activeModel = 4;
+    if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+        activeModel = 5;
+    if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+        activeModel = 6;
+
+    //Select shader
+    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) {
+        activeShader = 1;
+        rVal = 1.f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) {
+        activeShader = 2;
+        rVal = 1.f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) {
+        activeShader = 3;
+        rVal = 29.f;
+    }
+
     //Light position controls
     if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
         lightPositions += glm::vec3(0.f, 0.1f, 0.f);
@@ -319,7 +385,10 @@ void processInput(GLFWwindow* window)
         std::cout << "Enter r: ";
         std::cin >> rVal;
     }
-
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+        std::cout << "Enter z_min: ";
+        std::cin >> z_min;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
