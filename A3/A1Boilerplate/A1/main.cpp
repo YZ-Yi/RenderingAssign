@@ -40,8 +40,9 @@ float lastFrame = 0.0f;
 glm::mat4 rotation;
 float rotSpeed = 2.5f;
 
-glm::vec3 lightPositions = glm::vec3(0.f, 1.f, 0.f);
+glm::vec3 lightPositions = glm::vec3(0.f, 0.f, 10.f);
 int activeTex = 0;
+float rVal = 1.f;
 
 int main()
 {
@@ -129,16 +130,17 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
-    //Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
+    //Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
+    Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
     Model sphereModel("../models/sphere.obj");
-   // Model ourModel("../models/terrain-1.obj");
-    Model ourModel("../models/head.obj");
+    Model ourModel("../models/terrain-3.obj");
+    //Model ourModel("../models/head.obj");
+    //Model ourModel("../models/boss.obj");
 
-    std::string texPaths[] = { "../textures/material1.bmp", "../textures/material2.bmp", "../textures/aerial1.bmp", "../textures/aerial2.bmp" };
+    std::string texPaths[] = { "../textures/material1.png", "../textures/material2.png", "../textures/aerial1.png", "../textures/aerial2.png" };
     unsigned int textures[4];
 
     //The following block-of-code was adapted from code
@@ -153,18 +155,18 @@ int main()
         glGenTextures(1, &textures[i]);
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         // set the texture wrapping parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
         // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // load image, create texture and generate mipmaps
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
         unsigned char* data = stbi_load(texPaths[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         else
@@ -244,14 +246,15 @@ int main()
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
         //model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
-        model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// The default vase is a bit too big for our scene, so scale it down
-        //model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// The default vase is a bit too big for our scene, so scale it down
+        //model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// head
+        model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// terrain
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
         ourShader.setMat4("model", model);
         ourShader.setFloat("roughness", roughness);
         ourShader.setVec3("objectColour", objectColour);
+        ourShader.setFloat("rVal", rVal);
         
         ourModel.Draw(ourShader);
 
@@ -349,6 +352,13 @@ void processInput(GLFWwindow* window)
         lightPositions += glm::vec3(0.f, 0.f, 0.1f);
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
         lightPositions += glm::vec3(0.f, 0.f, -0.1f);
+
+    //Parameters
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+        std::cout << "Enter r: ";
+        std::cin >> rVal;
+    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

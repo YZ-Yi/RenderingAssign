@@ -10,6 +10,7 @@ uniform vec3 viewPos;
 uniform vec3 objectColour;
 uniform vec3 lightPositions;
 uniform vec3 lightIntensities;
+uniform float rVal;
 
 // texture samplers
 uniform sampler2D texture1;
@@ -17,18 +18,14 @@ uniform sampler2D texture1;
 void main()
 {   
     vec2 TexCoords;
-	float rVal = 1.0;
   	
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPositions - FragPos);
     vec3 viewDir = normalize(viewPos - FragPos);
 
-    //diffuse
-    float s = max(dot(norm, lightDir), 0.00);
-    //float s = dot(norm, lightDir);
+    float s =  max(dot(norm, lightDir), 0.00);
 
-    float t = max(dot(norm, viewDir), 0.00);
-    //float t = dot(norm, viewDir);
+    float t = abs(dot(norm, -viewDir));
     t = pow(t, rVal);
     TexCoords = vec2(s, t); 
         

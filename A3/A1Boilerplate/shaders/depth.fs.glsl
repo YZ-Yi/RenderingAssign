@@ -17,19 +17,18 @@ uniform sampler2D texture1;
 void main()
 {   
     vec2 TexCoords;
-	float rVal = 1.0;
-  	float z_min = 1.0;
+	float rVal = 29.0;
+  	float z_min = 0.002;
 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPositions - FragPos);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 viewDir = viewPos - FragPos;
 
-    //diffuse
-    //float s = max(dot(norm, lightDir), 0.00);
-    float s = max(dot(norm, lightDir), 0);
+    float s = max(dot(norm, lightDir), 0.0);
     float z_max = rVal * z_min;
-
-    float t = 1 - log(s / z_min) / log(z_max / z_min);
+    //float zVal = max(viewDir.z, 0);
+    float zVal = viewDir.z;
+    float t = 1 - log(zVal / z_min) / log(z_max / z_min);
 
     TexCoords = vec2(s, t); 
         
