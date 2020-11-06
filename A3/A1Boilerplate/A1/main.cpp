@@ -83,46 +83,6 @@ int main()
     }
 
 
-    /*
-    //-----------Test Textures-------------------------------
-    float vertices[] = {
-        0.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f,       1.0f, 1.0f,
-        0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,       1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f,      1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-    };
-
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    */
-
-    //----------------------test ends here------------------------------------------------------------
-
-
     
     // configure global opengl state
     // -----------------------------
@@ -131,14 +91,15 @@ int main()
     // build and compile shaders
     // -------------------------
     //Shader ourShader("../shaders/texture.vs.glsl", "../shaders/texture.fs.glsl");
-    Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
+    //Shader ourShader("../shaders/depth.vs.glsl", "../shaders/depth.fs.glsl");
+    Shader ourShader("../shaders/pm.vs.glsl", "../shaders/pm.fs.glsl");
 
     // load model(s), default model is vase.obj, can load multiple at a time
     // -----------
     Model sphereModel("../models/sphere.obj");
-    Model ourModel("../models/terrain-3.obj");
+    //Model ourModel("../models/terrain-3.obj");
     //Model ourModel("../models/head.obj");
-    //Model ourModel("../models/boss.obj");
+    Model ourModel("../models/boss.obj");
 
     std::string texPaths[] = { "../textures/material1.png", "../textures/material2.png", "../textures/aerial1.png", "../textures/aerial2.png" };
     unsigned int textures[4];
@@ -245,9 +206,9 @@ int main()
 
         //ACTION
         glm::mat4 model = rotation;// The model transformation of the mesh (controlled through arrows)
-        //model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
+        model = glm::scale(model, glm::vec3(1.f, 1.f, 1.f));	// The default vase is a bit too big for our scene, so scale it down
         //model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));	// head
-        model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// terrain
+        //model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));	// terrain
         float roughness = 0.3; // The roughness of the mesh [0,1]
         glm::vec3 objectColour = glm::vec3(0.722, 0.45, 0.2);
 
